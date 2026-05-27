@@ -1,0 +1,237 @@
+import type { ConsoleDefinition, EmulatorConfig, GameEntry, LibrarySnapshot, RetroLauncherApi } from '@shared/types'
+
+const previewConsoles: ConsoleDefinition[] = [
+  {
+    id: 'sega-genesis',
+    name: 'Sega Genesis',
+    shortName: 'Genesis',
+    manufacturer: 'Sega',
+    generation: '16-bit',
+    description: 'Arcade-speed platformers, shooters, and sports classics with sharp FM synth energy.',
+    colorFrom: '#1f6feb',
+    colorTo: '#ff4f8b',
+    accent: '#66d9ff',
+    romExtensions: ['.gen', '.md', '.smd', '.bin', '.zip'],
+    candidates: []
+  },
+  {
+    id: 'snes',
+    name: 'Super Nintendo',
+    shortName: 'SNES',
+    manufacturer: 'Nintendo',
+    generation: '16-bit',
+    description: 'Colorful RPGs, platformers, and couch classics with lush pixel art.',
+    colorFrom: '#7c5cff',
+    colorTo: '#5cf2c4',
+    accent: '#c4b5fd',
+    romExtensions: ['.smc', '.sfc', '.fig', '.swc', '.zip'],
+    candidates: []
+  },
+  {
+    id: 'n64',
+    name: 'Nintendo 64',
+    shortName: 'N64',
+    manufacturer: 'Nintendo',
+    generation: '64-bit',
+    description: 'Big-room 3D adventures, racers, and four-controller party legends.',
+    colorFrom: '#1db954',
+    colorTo: '#f7d65b',
+    accent: '#8df06f',
+    romExtensions: ['.z64', '.n64', '.v64', '.zip'],
+    candidates: []
+  },
+  {
+    id: 'ps1',
+    name: 'PlayStation 1',
+    shortName: 'PS1',
+    manufacturer: 'Sony',
+    generation: '32-bit',
+    description: 'Disc-era RPGs, racers, fighters, and cinematic experiments.',
+    colorFrom: '#7d8597',
+    colorTo: '#ff8a4c',
+    accent: '#ffd166',
+    romExtensions: ['.bin', '.cue', '.iso', '.chd'],
+    candidates: []
+  },
+  {
+    id: 'gba',
+    name: 'Game Boy Advance',
+    shortName: 'GBA',
+    manufacturer: 'Nintendo',
+    generation: 'Handheld',
+    description: 'Pocket-sized adventures with bright palettes and quick-session charm.',
+    colorFrom: '#ff4f8b',
+    colorTo: '#f7d65b',
+    accent: '#ffb3cf',
+    romExtensions: ['.gba', '.zip'],
+    candidates: []
+  },
+  {
+    id: 'nds',
+    name: 'Nintendo DS',
+    shortName: 'NDS',
+    manufacturer: 'Nintendo',
+    generation: 'Dual-screen',
+    description: 'Stylus-era RPGs, puzzle experiments, and portable curiosities.',
+    colorFrom: '#5cf2c4',
+    colorTo: '#8aa0ff',
+    accent: '#99f6e4',
+    romExtensions: ['.nds', '.zip'],
+    candidates: []
+  }
+]
+
+export const retroApi: RetroLauncherApi = window.retroLauncher ?? createPreviewApi()
+
+function createPreviewApi(): RetroLauncherApi {
+  let snapshot = createPreviewSnapshot()
+
+  return {
+    getSnapshot: async () => snapshot,
+    scanLibrary: async () => ({
+      snapshot,
+      summary: {
+        scannedAt: new Date().toISOString(),
+        totalGames: 0,
+        consoles: previewConsoles.map((consoleDef) => ({
+          consoleId: consoleDef.id,
+          romFolderPath: '',
+          totalGames: 0,
+          warnings: ['Browser preview mode. Run Electron for real scanning.']
+        }))
+      }
+    }),
+    detectEmulators: async () => ({ snapshot, detections: [] }),
+    saveEmulator: async (config) => {
+      snapshot = {
+        ...snapshot,
+        emulators: snapshot.emulators.map((item) => (item.consoleId === config.consoleId ? config : item))
+      }
+      return snapshot
+    },
+    chooseExecutable: async () => undefined,
+    chooseFolder: async () => undefined,
+    saveMetadataSettings: async (settings) => {
+      snapshot = {
+        ...snapshot,
+        metadataSettings: {
+          steamGridDb: {
+            enabled: settings.steamGridDb.enabled,
+            hasApiKey: Boolean(settings.steamGridDb.apiKey) || snapshot.metadataSettings.steamGridDb.hasApiKey
+          },
+          screenScraper: {
+            enabled: settings.screenScraper.enabled,
+            userName: settings.screenScraper.userName,
+            devId: settings.screenScraper.devId,
+            softName: settings.screenScraper.softName,
+            hasPassword: Boolean(settings.screenScraper.password) || snapshot.metadataSettings.screenScraper.hasPassword,
+            hasDevPassword:
+              Boolean(settings.screenScraper.devPassword) || snapshot.metadataSettings.screenScraper.hasDevPassword
+          },
+          preferProvider: settings.preferProvider
+        }
+      }
+      return snapshot
+    },
+    searchCovers: async (gameId, query) => ({
+      gameId,
+      query: query ?? '',
+      results: [],
+      warnings: ['Browser preview mode cannot call online cover providers. Run Electron to search covers.']
+    }),
+    downloadCover: async () => ({
+      snapshot,
+      result: {
+        ok: false,
+        message: 'Browser preview mode cannot download covers. Run Electron to save artwork locally.'
+      }
+    }),
+    downloadMissingCovers: async () => ({
+      snapshot,
+      summary: {
+        scanned: 0,
+        downloaded: 0,
+        failed: 0,
+        skipped: 0,
+        messages: ['Browser preview mode cannot download covers.']
+      }
+    }),
+    launchGame: async () => ({
+      snapshot,
+      result: {
+        ok: false,
+        message: 'Browser preview mode cannot launch games. Run the Electron app to launch locally.'
+      }
+    }),
+    toggleFavorite: async (gameId) => {
+      snapshot = {
+        ...snapshot,
+        games: snapshot.games.map((game) => (game.id === gameId ? { ...game, favorite: !game.favorite } : game))
+      }
+      snapshot.favorites = snapshot.games.filter((game) => game.favorite)
+      return snapshot
+    },
+    revealPath: async () => undefined
+  }
+}
+
+function createPreviewSnapshot(): LibrarySnapshot {
+  const now = new Date().toISOString()
+  const emulators: EmulatorConfig[] = previewConsoles.map((consoleDef) => ({
+    consoleId: consoleDef.id,
+    emulatorName: consoleDef.id === 'ps1' ? 'DuckStation' : consoleDef.id === 'snes' ? 'Snes9x' : 'RetroArch',
+    executablePath: '',
+    romFolderPath: '',
+    coverFolderPath: '',
+    supportedExtensions: consoleDef.romExtensions,
+    launchArguments: '"{rom}"',
+    retroArchCorePath: '',
+    updatedAt: now
+  }))
+  const games: GameEntry[] = previewConsoles.flatMap((consoleDef, consoleIndex) =>
+    ['Neon Circuit', 'Midnight Quest', 'Pixel Grand Prix'].map((suffix, index) => ({
+      id: `preview:${consoleDef.id}:${index}`,
+      consoleId: consoleDef.id,
+      title: `${consoleDef.shortName} ${suffix}`,
+      fileName: `${consoleDef.shortName}-${suffix}.sample`,
+      romPath: '',
+      extension: '.sample',
+      favorite: index === 0,
+      playCount: index === 1 ? consoleIndex + 1 : 0,
+      lastPlayed: index === 1 ? now : undefined,
+      addedAt: now,
+      updatedAt: now,
+      source: 'sample'
+    }))
+  )
+
+  return {
+    consoles: previewConsoles,
+    emulators,
+    metadataSettings: {
+      steamGridDb: {
+        enabled: false,
+        hasApiKey: false
+      },
+      screenScraper: {
+        enabled: false,
+        userName: '',
+        devId: '',
+        softName: 'RetroForge',
+        hasPassword: false,
+        hasDevPassword: false
+      },
+      preferProvider: 'steamgriddb'
+    },
+    games,
+    recentlyPlayed: games.filter((game) => game.lastPlayed),
+    favorites: games.filter((game) => game.favorite),
+    stats: {
+      totalGames: 0,
+      configuredConsoles: 0,
+      favoriteCount: 0,
+      recentlyPlayedCount: 0
+    },
+    sampleMode: true
+  }
+}
