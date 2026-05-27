@@ -44,7 +44,7 @@ export function GameCard({ game, consoleDef, onOpen, onLaunch, compact = false }
           className="inline-flex h-9 w-full items-center justify-center gap-2 rounded-md bg-white text-sm font-extrabold text-night transition hover:bg-mint focus:outline-none focus-visible:ring-2 focus-visible:ring-mint"
         >
           <Play className="h-4 w-4 fill-current" />
-          Play
+          Jugar
         </button>
       </div>
       <div

@@ -57,14 +57,14 @@ export function ConsoleScreen({
             <p className="mt-4 max-w-3xl text-lg leading-8 text-white/68">{consoleDef.description}</p>
           </div>
           <div className="grid min-w-[280px] gap-3 rounded-lg border border-white/12 bg-black/22 p-4 backdrop-blur-2xl">
-            <Info label="Emulator" value={emulator?.emulatorName || 'Not configured'} />
-            <Info label="ROM folder" value={shortPath(emulator?.romFolderPath, 42)} />
+            <Info label="Emulador" value={emulator?.emulatorName || 'No configurado'} />
+            <Info label="Carpeta ROM" value={shortPath(emulator?.romFolderPath, 42)} />
             <button
               type="button"
               onClick={onOpenSettings}
               className="mt-1 inline-flex h-10 items-center justify-center rounded-md bg-white text-sm font-extrabold text-night transition hover:bg-mint"
             >
-              Configure console
+              Configurar consola
             </button>
           </div>
         </div>
@@ -76,7 +76,7 @@ export function ConsoleScreen({
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder={`Search ${consoleDef.shortName} games`}
+            placeholder={`Buscar juegos de ${consoleDef.shortName}`}
             className="h-full min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/34"
           />
         </div>
@@ -89,7 +89,7 @@ export function ConsoleScreen({
             }`}
           >
             <Star className={`h-4 w-4 ${favoritesOnly ? 'fill-volt' : ''}`} />
-            Favorites
+            Favoritos
           </button>
           <label className="inline-flex h-11 items-center gap-2 rounded-md border border-white/10 bg-white/6 px-4 text-sm font-bold text-white/72">
             <SlidersHorizontal className="h-4 w-4" />
@@ -98,16 +98,16 @@ export function ConsoleScreen({
               onChange={(event) => setSortMode(event.target.value)}
               className="bg-transparent text-sm font-bold text-white outline-none"
             >
-              <option value="title">Title</option>
-              <option value="recent">Recently played</option>
-              <option value="plays">Play count</option>
+              <option value="title">Título</option>
+              <option value="recent">Jugados recientemente</option>
+              <option value="plays">Conteo de partidas</option>
             </select>
           </label>
         </div>
       </div>
 
       <GameCarousel
-        title="Recently Played"
+        title="Jugados Recientemente"
         games={sortGames(recentGames, 'recent').slice(0, 14)}
         consoles={snapshot.consoles}
         onOpenGame={onOpenGame}
@@ -115,7 +115,7 @@ export function ConsoleScreen({
         compact
       />
       <GameCarousel
-        title="Favorites"
+        title="Favoritos"
         games={favoriteGames.slice(0, 14)}
         consoles={snapshot.consoles}
         onOpenGame={onOpenGame}
@@ -125,8 +125,8 @@ export function ConsoleScreen({
 
       <section>
         <div className="mb-4">
-          <h2 className="font-display text-2xl font-bold text-white">All Games</h2>
-          <p className="mt-1 text-sm text-white/54">{filteredGames.length} visible entries</p>
+          <h2 className="font-display text-2xl font-bold text-white">Todos los Juegos</h2>
+          <p className="mt-1 text-sm text-white/54">{filteredGames.length} entradas visibles</p>
         </div>
         {filteredGames.length ? (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-5">
@@ -143,7 +143,7 @@ export function ConsoleScreen({
           </div>
         ) : (
           <div className="rounded-lg border border-white/8 bg-white/[0.045] p-10 text-center text-white/54">
-            No games match the current search and filters.
+            No hay juegos que coincidan con la búsqueda y filtros actuales.
           </div>
         )}
       </section>

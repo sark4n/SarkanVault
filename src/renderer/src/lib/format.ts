@@ -9,8 +9,8 @@ export function getEmulator(emulators: EmulatorConfig[], consoleId: ConsoleId): 
 }
 
 export function formatDate(value?: string): string {
-  if (!value) return 'Never'
-  return new Intl.DateTimeFormat(undefined, {
+  if (!value) return 'Nunca'
+  return new Intl.DateTimeFormat('es-ES', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -20,7 +20,7 @@ export function formatDate(value?: string): string {
 }
 
 export function shortPath(value?: string, maxLength = 64): string {
-  if (!value) return 'Not configured'
+  if (!value) return 'No configurado'
   if (value.length <= maxLength) return value
   return `...${value.slice(value.length - maxLength)}`
 }

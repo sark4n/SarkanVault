@@ -43,7 +43,7 @@ export function CoverFrame({ game, consoleDef, className = '', priority = false 
       </div>
       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/82 via-black/30 to-transparent p-5">
         <p className="line-clamp-2 text-lg font-extrabold leading-tight text-white">{game.title}</p>
-        <p className="mt-2 text-xs font-semibold uppercase text-white/62">Local cover missing</p>
+        <p className="mt-2 text-xs font-semibold uppercase text-white/62">Carátula local faltante</p>
       </div>
     </div>
   )

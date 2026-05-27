@@ -32,6 +32,7 @@ export default function App(): JSX.Element {
   const [view, setView] = useState<View>({ name: 'home' })
   const [isBusy, setIsBusy] = useState(false)
   const [toast, setToast] = useState<ToastState>()
+  const [searchQuery, setSearchQuery] = useState('')
 
   const showToast = useCallback((message: string, tone: ToastState['tone'] = 'info') => {
     setToast({ message, tone })
@@ -44,7 +45,7 @@ export default function App(): JSX.Element {
 
   useEffect(() => {
     refreshSnapshot().catch((error) => {
-      showToast(error instanceof Error ? error.message : 'Failed to load the local library.', 'error')
+      showToast(error instanceof Error ? error.message : 'Error al cargar la biblioteca local.', 'error')
     })
   }, [refreshSnapshot, showToast])
 
@@ -58,6 +59,22 @@ export default function App(): JSX.Element {
     if (!snapshot || view.name !== 'game') return undefined
     return snapshot.games.find((game) => game.id === view.gameId)
   }, [snapshot, view])
+
+  const filteredSnapshot = useMemo(() => {
+    if (!snapshot) return snapshot
+    if (!searchQuery.trim()) return snapshot
+    const normalizedQuery = searchQuery.toLowerCase().trim()
+    const filteredGames = snapshot.games.filter((game) => game.title.toLowerCase().includes(normalizedQuery))
+    return {
+      ...snapshot,
+      games: filteredGames,
+      favorites: filteredGames.filter((game) => game.favorite),
+      recentlyPlayed: filteredGames
+        .filter((game) => game.lastPlayed)
+        .sort((a, b) => new Date(b.lastPlayed ?? 0).getTime() - new Date(a.lastPlayed ?? 0).getTime())
+        .slice(0, 18)
+    }
+  }, [snapshot, searchQuery])
 
   const withBusy = useCallback(
     async (task: () => Promise<void>) => {
@@ -75,9 +92,9 @@ export default function App(): JSX.Element {
     await withBusy(async () => {
       const result = await retroApi.scanLibrary()
       setSnapshot(result.snapshot)
-      showToast(`Scan complete. Found ${result.summary.totalGames} local games.`, 'success')
+      showToast(`Escaneo completado. Se encontraron ${result.summary.totalGames} juegos locales.`, 'success')
     }).catch((error) => {
-      showToast(error instanceof Error ? error.message : 'Library scan failed.', 'error')
+      showToast(error instanceof Error ? error.message : 'Error al escanear la biblioteca.', 'error')
     })
   }, [showToast, withBusy])
 
@@ -86,11 +103,11 @@ export default function App(): JSX.Element {
       const result = await retroApi.detectEmulators()
       setSnapshot(result.snapshot)
       const message = result.detections.length
-        ? `Detected ${result.detections.length} emulator configuration${result.detections.length === 1 ? '' : 's'}.`
-        : 'No installed emulators were detected automatically. You can still configure paths manually.'
+        ? `Se detectaron ${result.detections.length} configuracion${result.detections.length === 1 ? '' : 'es'} de emulador.`
+        : 'No se detectaron emuladores instalados automáticamente. Todavía puedes configurar las rutas manualmente.'
       showToast(message, result.detections.length ? 'success' : 'info')
     }).catch((error) => {
-      showToast(error instanceof Error ? error.message : 'Emulator detection failed.', 'error')
+      showToast(error instanceof Error ? error.message : 'Error al detectar emuladores.', 'error')
     })
   }, [showToast, withBusy])
 
@@ -99,9 +116,9 @@ export default function App(): JSX.Element {
       await withBusy(async () => {
         const nextSnapshot = await retroApi.saveEmulator(config)
         setSnapshot(nextSnapshot)
-        showToast('Console configuration saved.', 'success')
+        showToast('Configuración de consola guardada.', 'success')
       }).catch((error) => {
-        showToast(error instanceof Error ? error.message : 'Could not save configuration.', 'error')
+        showToast(error instanceof Error ? error.message : 'No se pudo guardar la configuración.', 'error')
       })
     },
     [showToast, withBusy]
@@ -112,9 +129,9 @@ export default function App(): JSX.Element {
       await withBusy(async () => {
         const nextSnapshot = await retroApi.saveMetadataSettings(settings)
         setSnapshot(nextSnapshot)
-        showToast('Online cover settings saved.', 'success')
+        showToast('Configuración de carátulas online guardada.', 'success')
       }).catch((error) => {
-        showToast(error instanceof Error ? error.message : 'Could not save online cover settings.', 'error')
+        showToast(error instanceof Error ? error.message : 'No se pudo guardar la configuración de carátulas online.', 'error')
       })
     },
     [showToast, withBusy]
@@ -133,7 +150,7 @@ export default function App(): JSX.Element {
     async (game: GameEntry) => {
       const nextSnapshot = await retroApi.toggleFavorite(game.id)
       setSnapshot(nextSnapshot)
-      showToast(game.favorite ? 'Removed from favorites.' : 'Added to favorites.', 'success')
+      showToast(game.favorite ? 'Eliminado de favoritos.' : 'Añadido a favoritos.', 'success')
     },
     [showToast]
   )
@@ -164,11 +181,11 @@ export default function App(): JSX.Element {
         const response = await retroApi.downloadMissingCovers(consoleId, 30)
         setSnapshot(response.snapshot)
         showToast(
-          `Cover search complete. Downloaded ${response.summary.downloaded}, skipped ${response.summary.skipped}, failed ${response.summary.failed}.`,
+          `Búsqueda de carátulas completada. Descargadas: ${response.summary.downloaded}, omitidas: ${response.summary.skipped}, fallidas: ${response.summary.failed}.`,
           response.summary.failed ? 'info' : 'success'
         )
       }).catch((error) => {
-        showToast(error instanceof Error ? error.message : 'Missing cover download failed.', 'error')
+        showToast(error instanceof Error ? error.message : 'Error al descargar carátulas faltantes.', 'error')
       })
     },
     [showToast, withBusy]
@@ -186,26 +203,32 @@ export default function App(): JSX.Element {
       <div className="grid min-h-screen place-items-center bg-night text-white">
         <div className="rounded-lg border border-white/8 bg-white/[0.045] p-8 text-center shadow-card">
           <div className="mx-auto mb-5 h-12 w-12 animate-spin rounded-full border-2 border-white/20 border-t-mint" />
-          <p className="text-sm font-bold uppercase text-white/54">Loading RetroForge</p>
+          <p className="text-sm font-bold uppercase text-white/54">Cargando RetroForge</p>
         </div>
       </div>
     )
   }
 
+  const displaySnapshot = filteredSnapshot ?? snapshot
   const activeView = view.name === 'game' ? 'console' : view.name
 
   return (
     <AppShell
-      snapshot={snapshot}
+      snapshot={displaySnapshot}
       activeView={activeView}
       isBusy={isBusy}
-      onHome={() => setView({ name: 'home' })}
+      searchQuery={searchQuery}
+      onSearchChange={setSearchQuery}
+      onHome={() => {
+        setSearchQuery('')
+        setView({ name: 'home' })
+      }}
       onSettings={() => setView({ name: 'settings' })}
       onScan={handleScan}
     >
       {view.name === 'home' ? (
         <HomeScreen
-          snapshot={snapshot}
+          snapshot={displaySnapshot}
           onOpenConsole={(consoleId) => setView({ name: 'console', consoleId })}
           onOpenGame={openGame}
           onLaunchGame={handleLaunchGame}
@@ -215,7 +238,7 @@ export default function App(): JSX.Element {
       {view.name === 'console' ? (
         <ConsoleScreen
           consoleId={view.consoleId}
-          snapshot={snapshot}
+          snapshot={displaySnapshot}
           onOpenGame={openGame}
           onLaunchGame={handleLaunchGame}
           onOpenSettings={() => setView({ name: 'settings' })}

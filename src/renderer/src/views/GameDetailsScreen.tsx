@@ -91,14 +91,14 @@ export function GameDetailsScreen({
               onClick={onBack}
               className="mb-8 w-fit rounded-md border border-white/10 bg-white/7 px-4 py-2 text-sm font-bold text-white/72 transition hover:bg-white/12"
             >
-              Back
+              Volver
             </button>
             <p className="text-xs font-extrabold uppercase text-white/48">{consoleDef.name}</p>
             <h1 className="mt-3 font-display text-6xl font-bold leading-[1.02] text-white md:text-8xl">{game.title}</h1>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Badge icon={<Gamepad2 className="h-4 w-4" />} label={emulator?.emulatorName || 'No emulator'} />
-              <Badge icon={<TimerReset className="h-4 w-4" />} label={`Last played: ${formatDate(game.lastPlayed)}`} />
-              <Badge icon={<Star className="h-4 w-4" />} label={`${game.playCount} launches`} />
+              <Badge icon={<Gamepad2 className="h-4 w-4" />} label={emulator?.emulatorName || 'Sin emulador'} />
+              <Badge icon={<TimerReset className="h-4 w-4" />} label={`Última vez jugado: ${formatDate(game.lastPlayed)}`} />
+              <Badge icon={<Star className="h-4 w-4" />} label={`${game.playCount} partidas`} />
             </div>
 
             <div className="mt-9 flex flex-wrap gap-3">
@@ -108,7 +108,7 @@ export function GameDetailsScreen({
                 className="inline-flex h-14 items-center gap-3 rounded-md bg-white px-8 text-base font-extrabold text-night transition hover:bg-mint"
               >
                 <Play className="h-5 w-5 fill-current" />
-                Play
+                Jugar
               </button>
               <button
                 type="button"
@@ -120,7 +120,7 @@ export function GameDetailsScreen({
                 }`}
               >
                 <Heart className={`h-5 w-5 ${game.favorite ? 'fill-pulse' : ''}`} />
-                {game.favorite ? 'Favorited' : 'Favorite'}
+                {game.favorite ? 'En favoritos' : 'Favorito'}
               </button>
               {game.romPath ? (
                 <button
@@ -129,7 +129,7 @@ export function GameDetailsScreen({
                   className="inline-flex h-14 items-center gap-3 rounded-md border border-white/12 bg-white/8 px-6 text-base font-bold text-white transition hover:bg-white/14"
                 >
                   <FolderOpen className="h-5 w-5" />
-                  Reveal ROM
+                  Mostrar ROM
                 </button>
               ) : null}
               <button
@@ -139,7 +139,7 @@ export function GameDetailsScreen({
                 className="inline-flex h-14 items-center gap-3 rounded-md border border-mint/30 bg-mint/12 px-6 text-base font-bold text-mint transition hover:bg-mint/18 disabled:opacity-50"
               >
                 <ImagePlus className="h-5 w-5" />
-                {isSearching ? 'Searching' : 'Find covers'}
+                {isSearching ? 'Buscando' : 'Buscar carátulas'}
               </button>
             </div>
           </div>
@@ -149,8 +149,8 @@ export function GameDetailsScreen({
       <section className="rounded-lg border border-white/8 bg-white/[0.045] p-5 shadow-card backdrop-blur-2xl">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-extrabold uppercase text-white/42">Online artwork</p>
-            <h2 className="mt-2 font-display text-3xl font-bold text-white">Cover Search</h2>
+            <p className="text-xs font-extrabold uppercase text-white/42">Arte online</p>
+            <h2 className="mt-2 font-display text-3xl font-bold text-white">Búsqueda de Carátulas</h2>
           </div>
           <div className="flex min-w-0 flex-1 gap-2 lg:max-w-2xl">
             <div className="flex h-12 min-w-0 flex-1 items-center gap-3 rounded-md border border-white/10 bg-black/20 px-4">
@@ -159,7 +159,7 @@ export function GameDetailsScreen({
                 value={coverQuery}
                 onChange={(event) => setCoverQuery(event.target.value)}
                 className="h-full min-w-0 flex-1 bg-transparent text-sm font-semibold text-white outline-none placeholder:text-white/30"
-                placeholder="Search cover title"
+                placeholder="Buscar título de carátula"
               />
             </div>
             <button
@@ -169,7 +169,7 @@ export function GameDetailsScreen({
               className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-md bg-white px-5 text-sm font-extrabold text-night transition hover:bg-mint disabled:opacity-50"
             >
               <Search className="h-4 w-4" />
-              Search
+              Buscar
             </button>
           </div>
         </div>
@@ -199,7 +199,7 @@ export function GameDetailsScreen({
                     className="inline-flex h-9 w-full items-center justify-center gap-2 rounded-md bg-white text-xs font-extrabold text-night transition hover:bg-mint"
                   >
                     <Download className="h-3.5 w-3.5" />
-                    Use cover
+                    Usar carátula
                   </button>
                 </div>
               </article>
@@ -209,9 +209,9 @@ export function GameDetailsScreen({
       </section>
 
       <section className="grid gap-4 lg:grid-cols-3">
-        <Detail label="Emulator executable" value={shortPath(emulator?.executablePath, 92)} />
-        <Detail label="ROM path" value={shortPath(game.romPath, 92)} />
-        <Detail label="Cover path" value={shortPath(game.coverPath, 92)} />
+        <Detail label="Ejecutable del emulador" value={shortPath(emulator?.executablePath, 92)} />
+        <Detail label="Ruta del ROM" value={shortPath(game.romPath, 92)} />
+        <Detail label="Ruta de la carátula" value={shortPath(game.coverPath, 92)} />
       </section>
     </div>
   )

@@ -21,7 +21,7 @@ export function Toast({ message, tone = 'info', onDismiss }: ToastProps): JSX.El
       className={`fixed bottom-6 right-6 z-50 flex max-w-md items-start gap-3 rounded-lg border px-4 py-3 shadow-card backdrop-blur-2xl ${toneClass}`}
     >
       <p className="text-sm font-semibold leading-5">{message}</p>
-      <button type="button" onClick={onDismiss} className="rounded-md p-1 hover:bg-white/10" title="Dismiss">
+      <button type="button" onClick={onDismiss} className="rounded-md p-1 hover:bg-white/10" title="Cerrar">
         <X className="h-4 w-4" />
       </button>
     </div>

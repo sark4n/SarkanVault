@@ -40,7 +40,7 @@ export function HomeScreen({
           <div className="flex max-w-3xl flex-col justify-center">
             <div className="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-white/14 bg-black/24 px-4 py-2 text-xs font-extrabold uppercase text-white/70 backdrop-blur-xl">
               <Flame className="h-4 w-4 text-ember" />
-              Featured locally
+              Destacado localmente
             </div>
             <h1 className="font-display text-5xl font-bold leading-[1.03] text-white md:text-7xl">{heroGame.title}</h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-white/68">{heroConsole.description}</p>
@@ -50,20 +50,20 @@ export function HomeScreen({
                 onClick={() => onLaunchGame(heroGame)}
                 className="inline-flex h-12 items-center gap-2 rounded-md bg-white px-6 text-sm font-extrabold text-night transition hover:bg-mint"
               >
-                Launch game
+                Ejecutar juego
               </button>
               <button
                 type="button"
                 onClick={() => onOpenGame(heroGame)}
                 className="inline-flex h-12 items-center gap-2 rounded-md border border-white/14 bg-white/8 px-6 text-sm font-bold text-white transition hover:bg-white/14"
               >
-                Details
+                Detalles
               </button>
             </div>
             <div className="mt-8 grid max-w-2xl grid-cols-3 gap-3">
-              <HeroStat icon={<LibraryBig className="h-4 w-4" />} label="Games" value={snapshot.stats.totalGames || snapshot.games.length} />
-              <HeroStat icon={<Star className="h-4 w-4" />} label="Favorites" value={snapshot.favorites.length} />
-              <HeroStat icon={<TimerReset className="h-4 w-4" />} label="Recent" value={snapshot.recentlyPlayed.length} />
+              <HeroStat icon={<LibraryBig className="h-4 w-4" />} label="Juegos" value={snapshot.stats.totalGames || snapshot.games.length} />
+              <HeroStat icon={<Star className="h-4 w-4" />} label="Favoritos" value={snapshot.favorites.length} />
+              <HeroStat icon={<TimerReset className="h-4 w-4" />} label="Recientes" value={snapshot.recentlyPlayed.length} />
             </div>
           </div>
           <button
@@ -81,8 +81,8 @@ export function HomeScreen({
       <section>
         <div className="mb-4 flex items-end justify-between">
           <div>
-            <h2 className="font-display text-2xl font-bold text-white">Console Hubs</h2>
-            <p className="mt-1 text-sm text-white/54">Configure emulators once, then browse each system like a media shelf.</p>
+            <h2 className="font-display text-2xl font-bold text-white">Centros de Consolas</h2>
+            <p className="mt-1 text-sm text-white/54">Configura los emuladores una vez, luego explora cada sistema como una estantería multimedia.</p>
           </div>
         </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -99,8 +99,8 @@ export function HomeScreen({
       </section>
 
       <GameCarousel
-        title="Continue Playing"
-        subtitle="Sorted from your most recent launches."
+        title="Continuar Jugando"
+        subtitle="Ordenados por tus lanzamientos más recientes."
         games={continuePlaying.slice(0, 18)}
         consoles={snapshot.consoles}
         onOpenGame={onOpenGame}
@@ -108,16 +108,16 @@ export function HomeScreen({
         compact
       />
       <GameCarousel
-        title="Favorites"
-        subtitle="Pinned games stay one click away."
+        title="Favoritos"
+        subtitle="Los juegos fijados están a un clic de distancia."
         games={featured}
         consoles={snapshot.consoles}
         onOpenGame={onOpenGame}
         onLaunchGame={onLaunchGame}
       />
       <GameCarousel
-        title="Recently Added"
-        subtitle="Freshly scanned ROMs and sample entries."
+        title="Añadidos Recientemente"
+        subtitle="ROMs escaneados recientemente y entradas de muestra."
         games={allGames}
         consoles={snapshot.consoles}
         onOpenGame={onOpenGame}

@@ -66,7 +66,7 @@ export function SettingsScreen({
   }
 
   if (!selectedDraft) {
-    return <div className="rounded-lg border border-white/8 bg-white/[0.045] p-8 text-white/70">Loading settings...</div>
+    return <div className="rounded-lg border border-white/8 bg-white/[0.045] p-8 text-white/70">Cargando configuración...</div>
   }
 
   return (
@@ -75,10 +75,10 @@ export function SettingsScreen({
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(92,242,196,0.16),transparent_26%),radial-gradient(circle_at_86%_12%,rgba(255,79,139,0.14),transparent_30%)]" />
         <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-extrabold uppercase text-white/44">Local configuration</p>
-            <h1 className="mt-3 font-display text-5xl font-bold text-white md:text-7xl">Library Setup</h1>
+            <p className="text-xs font-extrabold uppercase text-white/44">Configuración local</p>
+            <h1 className="mt-3 font-display text-5xl font-bold text-white md:text-7xl">Configuración de Biblioteca</h1>
             <p className="mt-4 max-w-3xl text-lg leading-8 text-white/62">
-              Detect installed emulators, assign ROM folders, point cover folders at your local artwork, then scan.
+              Detecta los emuladores instalados, asigna carpetas de ROMs, indica carpetas de carátulas en tu arte local y luego escanea.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -89,7 +89,7 @@ export function SettingsScreen({
               className="inline-flex h-12 items-center gap-2 rounded-md border border-white/12 bg-white/8 px-5 text-sm font-bold text-white transition hover:bg-white/14 disabled:opacity-50"
             >
               <Search className="h-4 w-4" />
-              Detect emulators
+              Detectar emuladores
             </button>
             <button
               type="button"
@@ -98,26 +98,26 @@ export function SettingsScreen({
               className="inline-flex h-12 items-center gap-2 rounded-md bg-white px-5 text-sm font-extrabold text-night transition hover:bg-mint disabled:opacity-50"
             >
               <RefreshCw className={`h-4 w-4 ${isBusy ? 'animate-spin' : ''}`} />
-              Scan library
+              Escanear biblioteca
             </button>
           </div>
         </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
-        <SetupStat icon={<Cpu className="h-5 w-5" />} label="Configured systems" value={`${configuredCount}/${snapshot.consoles.length}`} />
-        <SetupStat icon={<Database className="h-5 w-5" />} label="Scanned games" value={String(snapshot.stats.totalGames)} />
-        <SetupStat icon={<Settings2 className="h-5 w-5" />} label="Data mode" value={metadataDraft.steamGridDb.enabled || metadataDraft.screenScraper.enabled ? 'Hybrid' : 'Offline JSON'} />
+        <SetupStat icon={<Cpu className="h-5 w-5" />} label="Sistemas configurados" value={`${configuredCount}/${snapshot.consoles.length}`} />
+        <SetupStat icon={<Database className="h-5 w-5" />} label="Juegos escaneados" value={String(snapshot.stats.totalGames)} />
+        <SetupStat icon={<Settings2 className="h-5 w-5" />} label="Modo de datos" value={metadataDraft.steamGridDb.enabled || metadataDraft.screenScraper.enabled ? 'Híbrido' : 'JSON Offline'} />
       </section>
 
       <section className="overflow-hidden rounded-lg border border-white/8 bg-white/[0.045] shadow-card backdrop-blur-2xl">
         <div className="border-b border-white/8 p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="text-xs font-extrabold uppercase text-white/42">Online covers</p>
-              <h2 className="mt-2 font-display text-4xl font-bold text-white">Artwork Providers</h2>
+              <p className="text-xs font-extrabold uppercase text-white/42">Carátulas online</p>
+              <h2 className="mt-2 font-display text-4xl font-bold text-white">Proveedores de Arte</h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-white/54">
-                Searches run only when requested and downloaded images are stored in your local cover folders.
+                Las búsquedas se ejecutan solo cuando se solicitan y las imágenes descargadas se almacenan en tus carpetas de carátulas locales.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -128,7 +128,7 @@ export function SettingsScreen({
                 className="inline-flex h-11 items-center gap-2 rounded-md border border-white/12 bg-white/8 px-4 text-sm font-bold text-white transition hover:bg-white/14 disabled:opacity-50"
               >
                 <Download className="h-4 w-4" />
-                Missing for console
+                Faltantes para consola
               </button>
               <button
                 type="button"
@@ -137,7 +137,7 @@ export function SettingsScreen({
                 className="inline-flex h-11 items-center gap-2 rounded-md bg-white px-4 text-sm font-extrabold text-night transition hover:bg-mint disabled:opacity-50"
               >
                 <Cloud className="h-4 w-4" />
-                Missing for all
+                Faltantes para todas
               </button>
             </div>
           </div>
@@ -156,7 +156,7 @@ export function SettingsScreen({
               }
             />
             <Field
-              label={snapshot.metadataSettings.steamGridDb.hasApiKey ? 'API key (saved)' : 'API key'}
+              label={snapshot.metadataSettings.steamGridDb.hasApiKey ? 'Clave API (guardada)' : 'Clave API'}
               value={metadataDraft.steamGridDb.apiKey}
               onChange={(apiKey) =>
                 setMetadataDraft((draft) => ({
@@ -164,7 +164,7 @@ export function SettingsScreen({
                   steamGridDb: { ...draft.steamGridDb, apiKey }
                 }))
               }
-              placeholder={snapshot.metadataSettings.steamGridDb.hasApiKey ? 'Leave blank to keep saved key' : 'SteamGridDB API key'}
+              placeholder={snapshot.metadataSettings.steamGridDb.hasApiKey ? 'Dejar en blanco para mantener la clave guardada' : 'Clave API de SteamGridDB'}
               type="password"
             />
           </div>
@@ -182,7 +182,7 @@ export function SettingsScreen({
             />
             <div className="grid gap-4 md:grid-cols-2">
               <Field
-                label="User"
+                label="Usuario"
                 value={metadataDraft.screenScraper.userName}
                 onChange={(userName) =>
                   setMetadataDraft((draft) => ({
@@ -190,10 +190,10 @@ export function SettingsScreen({
                     screenScraper: { ...draft.screenScraper, userName }
                   }))
                 }
-                placeholder="ScreenScraper user"
+                placeholder="Usuario de ScreenScraper"
               />
               <Field
-                label={snapshot.metadataSettings.screenScraper.hasPassword ? 'Password (saved)' : 'Password'}
+                label={snapshot.metadataSettings.screenScraper.hasPassword ? 'Contraseña (guardada)' : 'Contraseña'}
                 value={metadataDraft.screenScraper.password}
                 onChange={(password) =>
                   setMetadataDraft((draft) => ({
@@ -201,11 +201,11 @@ export function SettingsScreen({
                     screenScraper: { ...draft.screenScraper, password }
                   }))
                 }
-                placeholder={snapshot.metadataSettings.screenScraper.hasPassword ? 'Leave blank to keep saved password' : 'Password'}
+                placeholder={snapshot.metadataSettings.screenScraper.hasPassword ? 'Dejar en blanco para mantener la contraseña guardada' : 'Contraseña'}
                 type="password"
               />
               <Field
-                label="Dev ID"
+                label="ID de Desarrollador"
                 value={metadataDraft.screenScraper.devId}
                 onChange={(devId) =>
                   setMetadataDraft((draft) => ({
@@ -213,10 +213,10 @@ export function SettingsScreen({
                     screenScraper: { ...draft.screenScraper, devId }
                   }))
                 }
-                placeholder="Developer ID"
+                placeholder="ID de Desarrollador"
               />
               <Field
-                label={snapshot.metadataSettings.screenScraper.hasDevPassword ? 'Dev password (saved)' : 'Dev password'}
+                label={snapshot.metadataSettings.screenScraper.hasDevPassword ? 'Contraseña Dev (guardada)' : 'Contraseña Dev'}
                 value={metadataDraft.screenScraper.devPassword}
                 onChange={(devPassword) =>
                   setMetadataDraft((draft) => ({
@@ -224,7 +224,7 @@ export function SettingsScreen({
                     screenScraper: { ...draft.screenScraper, devPassword }
                   }))
                 }
-                placeholder={snapshot.metadataSettings.screenScraper.hasDevPassword ? 'Leave blank to keep saved secret' : 'Developer password'}
+                placeholder={snapshot.metadataSettings.screenScraper.hasDevPassword ? 'Dejar en blanco para mantener el secreto guardad' : 'Contraseña de Desarrollador'}
                 type="password"
               />
             </div>
@@ -233,7 +233,7 @@ export function SettingsScreen({
 
         <div className="flex flex-col gap-3 border-t border-white/8 p-6 md:flex-row md:items-center md:justify-between">
           <label className="inline-flex h-11 items-center gap-2 rounded-md border border-white/10 bg-white/6 px-4 text-sm font-bold text-white/72">
-            Preferred
+            Preferido
             <select
               value={metadataDraft.preferProvider}
               onChange={(event) =>
@@ -254,7 +254,7 @@ export function SettingsScreen({
             className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-white px-5 text-sm font-extrabold text-night transition hover:bg-mint"
           >
             <Save className="h-4 w-4" />
-            Save artwork settings
+            Guardar configuración de arte
           </button>
         </div>
       </section>
@@ -276,7 +276,7 @@ export function SettingsScreen({
                 <span>
                   <span className="block text-sm font-extrabold text-white">{consoleDef.name}</span>
                   <span className="mt-1 block truncate text-xs text-white/46">
-                    {config?.emulatorName || 'No emulator selected'}
+                    {config?.emulatorName || 'Ningún emulador seleccionado'}
                   </span>
                 </span>
                 <span
@@ -302,34 +302,34 @@ export function SettingsScreen({
 
           <div className="grid gap-6 p-6">
             <Field
-              label="Emulator name"
+              label="Nombre del emulador"
               value={selectedDraft.emulatorName}
               onChange={(value) => updateDraft(selectedConsoleId, { emulatorName: value })}
               placeholder="Snes9x, DuckStation, RetroArch..."
             />
             <PathField
-              label="Executable path"
+              label="Ruta del ejecutable"
               value={selectedDraft.executablePath}
               onChange={(value) => updateDraft(selectedConsoleId, { executablePath: value })}
               onBrowse={chooseExecutable}
-              placeholder="C:\\Emulators\\Snes9x\\snes9x.exe"
+              placeholder="C:\\Emuladores\\Snes9x\\snes9x.exe"
             />
             <PathField
-              label="ROM folder"
+              label="Carpeta de ROMs"
               value={selectedDraft.romFolderPath}
               onChange={(value) => updateDraft(selectedConsoleId, { romFolderPath: value })}
               onBrowse={() => chooseFolder('romFolderPath')}
               placeholder="D:\\ROMs\\SNES"
             />
             <PathField
-              label="Cover image folder"
+              label="Carpeta de carátulas"
               value={selectedDraft.coverFolderPath}
               onChange={(value) => updateDraft(selectedConsoleId, { coverFolderPath: value })}
               onBrowse={() => chooseFolder('coverFolderPath')}
-              placeholder="D:\\ROMs\\SNES\\Covers"
+              placeholder="D:\\ROMs\\SNES\\Caratulas"
             />
             <Field
-              label="Supported ROM extensions"
+              label="Extensiones de ROM soportadas"
               value={selectedDraft.supportedExtensions.join(', ')}
               onChange={(value) =>
                 updateDraft(selectedConsoleId, {
@@ -343,28 +343,28 @@ export function SettingsScreen({
               placeholder=".smc, .sfc, .zip"
             />
             <Field
-              label="Launch arguments"
+              label="Argumentos de lanzamiento"
               value={selectedDraft.launchArguments}
               onChange={(value) => updateDraft(selectedConsoleId, { launchArguments: value })}
               placeholder='-L "{core}" "{rom}"'
-              helper='Use "{rom}" for the ROM path and "{core}" for optional RetroArch cores.'
+              helper='Usa "{rom}" para la ruta del ROM y "{core}" para cores opcionales de RetroArch.'
             />
             <Field
-              label="RetroArch core path"
+              label="Ruta del core RetroArch"
               value={selectedDraft.retroArchCorePath}
               onChange={(value) => updateDraft(selectedConsoleId, { retroArchCorePath: value })}
               placeholder="C:\\RetroArch\\cores\\snes9x_libretro.dll"
             />
 
             <div className="flex flex-col gap-3 rounded-lg border border-white/8 bg-black/18 p-4 text-sm text-white/58 md:flex-row md:items-center md:justify-between">
-              <span className="min-w-0 truncate">Current ROM folder: {shortPath(selectedDraft.romFolderPath, 78)}</span>
+              <span className="min-w-0 truncate">Carpeta de ROMs actual: {shortPath(selectedDraft.romFolderPath, 78)}</span>
               <button
                 type="button"
                 onClick={() => onSave(selectedDraft)}
                 className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-md bg-white px-5 text-sm font-extrabold text-night transition hover:bg-mint"
               >
                 <Save className="h-4 w-4" />
-                Save console
+                Guardar consola
               </button>
             </div>
           </div>
@@ -428,7 +428,7 @@ function ProviderToggle({ title, enabled, onChange }: ProviderToggleProps): JSX.
     <div className="mb-5 flex items-center justify-between gap-4">
       <div>
         <h3 className="font-display text-2xl font-bold text-white">{title}</h3>
-        <p className="mt-1 text-xs font-semibold uppercase text-white/42">{enabled ? 'Enabled' : 'Disabled'}</p>
+        <p className="mt-1 text-xs font-semibold uppercase text-white/42">{enabled ? 'Habilitado' : 'Deshabilitado'}</p>
       </div>
       <label className="relative inline-flex cursor-pointer items-center">
         <input type="checkbox" checked={enabled} onChange={(event) => onChange(event.target.checked)} className="peer sr-only" />
@@ -476,7 +476,7 @@ function PathField({ label, value, onChange, onBrowse, placeholder }: PathFieldP
           type="button"
           onClick={onBrowse}
           className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-white/10 bg-white/7 text-white transition hover:bg-white/14"
-          title={`Browse ${label}`}
+          title={`Explorar ${label}`}
         >
           <FolderOpen className="h-5 w-5" />
         </button>

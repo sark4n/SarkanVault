@@ -32,8 +32,8 @@ export function ConsoleTile({ consoleDef, games, config, onOpen }: ConsoleTilePr
         </div>
         <div className="mt-8 flex items-end justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold text-white/80">{games.length} games</p>
-            <p className="mt-1 text-xs text-white/58">{isConfigured(config) ? 'Configured' : 'Needs setup'}</p>
+            <p className="text-sm font-semibold text-white/80">{games.length} juegos</p>
+            <p className="mt-1 text-xs text-white/58">{isConfigured(config) ? 'Configurado' : 'Necesita configuración'}</p>
           </div>
           <span className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-white text-night transition group-hover:translate-x-1">
             <ChevronRight className="h-5 w-5" />

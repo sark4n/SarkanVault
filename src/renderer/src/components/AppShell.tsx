@@ -1,10 +1,12 @@
-import { Database, Gamepad2, Home, RefreshCw, Search, Settings, Sparkles } from 'lucide-react'
+import { Database, Gamepad2, Chrome as Home, RefreshCw, Search, Settings, Sparkles } from 'lucide-react'
 import type { LibrarySnapshot } from '@shared/types'
 
 interface AppShellProps {
   snapshot: LibrarySnapshot
   activeView: string
   isBusy: boolean
+  searchQuery: string
+  onSearchChange: (query: string) => void
   onHome: () => void
   onSettings: () => void
   onScan: () => void
@@ -15,6 +17,8 @@ export function AppShell({
   snapshot,
   activeView,
   isBusy,
+  searchQuery,
+  onSearchChange,
   onHome,
   onSettings,
   onScan,
@@ -33,18 +37,18 @@ export function AppShell({
             type="button"
             onClick={onHome}
             className="mb-10 flex h-12 w-12 items-center justify-center rounded-lg bg-white text-night shadow-glow"
-            title="Home"
+            title="Inicio"
           >
             <Gamepad2 className="h-6 w-6" />
           </button>
           <nav className="flex flex-1 flex-col gap-4">
-            <NavIcon active={activeView === 'home'} title="Home" onClick={onHome}>
+            <NavIcon active={activeView === 'home'} title="Inicio" onClick={onHome}>
               <Home className="h-5 w-5" />
             </NavIcon>
-            <NavIcon active={activeView === 'console'} title="Library" onClick={onHome}>
+            <NavIcon active={activeView === 'console'} title="Biblioteca" onClick={onHome}>
               <Database className="h-5 w-5" />
             </NavIcon>
-            <NavIcon active={activeView === 'settings'} title="Settings" onClick={onSettings}>
+            <NavIcon active={activeView === 'settings'} title="Configuración" onClick={onSettings}>
               <Settings className="h-5 w-5" />
             </NavIcon>
           </nav>
@@ -52,7 +56,7 @@ export function AppShell({
             type="button"
             onClick={onScan}
             className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-white/7 text-white/78 transition hover:bg-white/12"
-            title="Scan library"
+            title="Escanear biblioteca"
           >
             <RefreshCw className={`h-5 w-5 ${isBusy ? 'animate-spin' : ''}`} />
           </button>
@@ -68,14 +72,20 @@ export function AppShell({
             <span className="min-w-0">
               <span className="block font-display text-xl font-bold text-white">RetroForge</span>
               <span className="block truncate text-xs font-semibold uppercase text-white/48">
-                Local arcade command center
+                Centro de comando arcade local
               </span>
             </span>
           </button>
           <div className="hidden min-w-0 flex-1 items-center justify-center md:flex">
-            <div className="flex h-11 w-full max-w-xl items-center gap-3 rounded-md border border-white/8 bg-black/20 px-4 text-white/42">
-              <Search className="h-4 w-4 shrink-0" />
-              <span className="truncate text-sm">Search inside each console, scan from settings, launch locally</span>
+            <div className="flex h-11 w-full max-w-xl items-center gap-3 rounded-md border border-white/8 bg-black/20 px-4">
+              <Search className="h-4 w-4 shrink-0 text-white/38" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+                className="h-full min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/34"
+                placeholder="Buscar juegos..."
+              />
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -85,7 +95,7 @@ export function AppShell({
               className="inline-flex h-11 items-center gap-2 rounded-md border border-white/10 bg-white/8 px-4 text-sm font-bold text-white transition hover:bg-white/14"
             >
               <RefreshCw className={`h-4 w-4 ${isBusy ? 'animate-spin' : ''}`} />
-              Scan
+              Escanear
             </button>
             <button
               type="button"
@@ -93,7 +103,7 @@ export function AppShell({
               className="inline-flex h-11 items-center gap-2 rounded-md bg-white px-4 text-sm font-extrabold text-night transition hover:bg-mint"
             >
               <Settings className="h-4 w-4" />
-              Setup
+              Configurar
             </button>
           </div>
         </header>
@@ -102,8 +112,8 @@ export function AppShell({
           <div className="mb-6 flex items-start gap-3 rounded-lg border border-volt/20 bg-volt/10 px-4 py-3 text-sm text-volt">
             <Sparkles className="mt-0.5 h-4 w-4 shrink-0" />
             <p>
-              Showing sample shelves until ROM folders are configured. Everything here is offline and local; your real
-              games appear after setup and scan.
+              Mostrando estanterías de muestra hasta que se configuren las carpetas de ROMs. Todo aquí es offline y local; tus juegos
+              reales aparecerán después de la configuración y el escaneo.
             </p>
           </div>
         ) : null}
