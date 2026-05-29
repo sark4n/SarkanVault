@@ -1,5 +1,7 @@
 import { Database, Gamepad2, Chrome as Home, RefreshCw, Search, Settings, Sparkles } from 'lucide-react'
-import type { LibrarySnapshot } from '@shared/types'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import type { GameEntry, LibrarySnapshot } from '@shared/types'
+import { SearchDropdown } from '@renderer/components/SearchDropdown'
 
 interface AppShellProps {
   snapshot: LibrarySnapshot
@@ -10,6 +12,8 @@ interface AppShellProps {
   onHome: () => void
   onSettings: () => void
   onScan: () => void
+  onSelectSearchResult: (game: GameEntry) => void
+  onLaunchSearchResult: (game: GameEntry) => void
   children: React.ReactNode
 }
 
@@ -22,8 +26,35 @@ export function AppShell({
   onHome,
   onSettings,
   onScan,
+  onSelectSearchResult,
+  onLaunchSearchResult,
   children
 }: AppShellProps): JSX.Element {
+  const [searchOpen, setSearchOpen] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const focusSearch = useCallback(() => {
+    inputRef.current?.focus()
+    setSearchOpen(true)
+  }, [])
+
+  const clearSearch = useCallback(() => {
+    onSearchChange('')
+    setSearchOpen(false)
+    inputRef.current?.blur()
+  }, [onSearchChange])
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault()
+        focusSearch()
+      }
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [focusSearch])
+
   return (
     <div className="min-h-screen bg-night text-white">
       <div className="fixed inset-0 overflow-hidden">
@@ -76,18 +107,49 @@ export function AppShell({
               </span>
             </span>
           </button>
-          <div className="hidden min-w-0 flex-1 items-center justify-center md:flex">
+          <div className="relative hidden min-w-0 flex-1 items-center justify-center md:flex">
             <div className="flex h-11 w-full max-w-xl items-center gap-3 rounded-md border border-white/8 bg-black/20 px-4">
               <Search className="h-4 w-4 shrink-0 text-white/38" />
               <input
+                ref={inputRef}
                 type="text"
                 value={searchQuery}
-                onChange={(e) => onSearchChange(e.target.value)}
+                onChange={(e) => {
+                  onSearchChange(e.target.value)
+                  setSearchOpen(true)
+                }}
+                onFocus={() => setSearchOpen(true)}
                 className="h-full min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/34"
                 placeholder="Buscar juegos..."
               />
+              {!searchQuery && (
+                <kbd className="shrink-0 rounded border border-white/12 bg-white/6 px-2 py-0.5 text-[10px] font-semibold text-white/34">
+                  Ctrl+K
+                </kbd>
+              )}
             </div>
+            <SearchDropdown
+              query={searchQuery}
+              games={snapshot.games}
+              consoles={snapshot.consoles}
+              onSelect={(game) => {
+                onSelectSearchResult(game)
+                clearSearch()
+              }}
+              onLaunch={(game) => {
+                onLaunchSearchResult(game)
+                clearSearch()
+              }}
+              onClose={clearSearch}
+              visible={searchOpen}
+            />
           </div>
+          {searchOpen && searchQuery && (
+            <div
+              className="fixed inset-0 z-40"
+              onClick={clearSearch}
+            />
+          )}
           <div className="flex items-center gap-3">
             <button
               type="button"

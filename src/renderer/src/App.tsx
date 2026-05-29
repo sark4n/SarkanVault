@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type {
   ConsoleId,
   CoverSearchResponse,
@@ -33,6 +33,8 @@ export default function App(): JSX.Element {
   const [isBusy, setIsBusy] = useState(false)
   const [toast, setToast] = useState<ToastState>()
   const [searchQuery, setSearchQuery] = useState('')
+  const [transitionKey, setTransitionKey] = useState(0)
+  const prevViewName = useRef<string>(view.name)
 
   const showToast = useCallback((message: string, tone: ToastState['tone'] = 'info') => {
     setToast({ message, tone })
@@ -55,26 +57,17 @@ export default function App(): JSX.Element {
     return () => window.clearTimeout(timeoutId)
   }, [toast])
 
+  useEffect(() => {
+    if (prevViewName.current !== view.name) {
+      prevViewName.current = view.name
+      setTransitionKey((k) => k + 1)
+    }
+  }, [view.name])
+
   const selectedGame = useMemo(() => {
     if (!snapshot || view.name !== 'game') return undefined
     return snapshot.games.find((game) => game.id === view.gameId)
   }, [snapshot, view])
-
-  const filteredSnapshot = useMemo(() => {
-    if (!snapshot) return snapshot
-    if (!searchQuery.trim()) return snapshot
-    const normalizedQuery = searchQuery.toLowerCase().trim()
-    const filteredGames = snapshot.games.filter((game) => game.title.toLowerCase().includes(normalizedQuery))
-    return {
-      ...snapshot,
-      games: filteredGames,
-      favorites: filteredGames.filter((game) => game.favorite),
-      recentlyPlayed: filteredGames
-        .filter((game) => game.lastPlayed)
-        .sort((a, b) => new Date(b.lastPlayed ?? 0).getTime() - new Date(a.lastPlayed ?? 0).getTime())
-        .slice(0, 18)
-    }
-  }, [snapshot, searchQuery])
 
   const withBusy = useCallback(
     async (task: () => Promise<void>) => {
@@ -209,12 +202,62 @@ export default function App(): JSX.Element {
     )
   }
 
-  const displaySnapshot = filteredSnapshot ?? snapshot
   const activeView = view.name === 'game' ? 'console' : view.name
+
+  let viewContent: React.ReactNode
+  if (view.name === 'home') {
+    viewContent = (
+      <HomeScreen
+        snapshot={snapshot}
+        onOpenConsole={(consoleId) => setView({ name: 'console', consoleId })}
+        onOpenGame={openGame}
+        onLaunchGame={handleLaunchGame}
+      />
+    )
+  } else if (view.name === 'console') {
+    viewContent = (
+      <ConsoleScreen
+        consoleId={view.consoleId}
+        snapshot={snapshot}
+        onOpenGame={openGame}
+        onLaunchGame={handleLaunchGame}
+        onOpenSettings={() => setView({ name: 'settings' })}
+      />
+    )
+  } else if (view.name === 'game' && selectedGame) {
+    viewContent = (
+      <GameDetailsScreen
+        game={selectedGame}
+        snapshot={snapshot}
+        onBack={() => (view.returnTo ? setView({ name: 'console', consoleId: view.returnTo }) : setView({ name: 'home' }))}
+        onLaunch={handleLaunchGame}
+        onToggleFavorite={handleToggleFavorite}
+        onSearchCovers={handleSearchCovers}
+        onDownloadCover={handleDownloadCover}
+        onRevealPath={(filePath) => {
+          void retroApi.revealPath(filePath)
+        }}
+      />
+    )
+  } else if (view.name === 'settings') {
+    viewContent = (
+      <SettingsScreen
+        snapshot={snapshot}
+        isBusy={isBusy}
+        onDetect={handleDetect}
+        onScan={handleScan}
+        onSave={handleSaveEmulator}
+        onSaveMetadataSettings={handleSaveMetadataSettings}
+        onDownloadMissingCovers={handleDownloadMissingCovers}
+        onChooseExecutable={retroApi.chooseExecutable}
+        onChooseFolder={retroApi.chooseFolder}
+      />
+    )
+  }
 
   return (
     <AppShell
-      snapshot={displaySnapshot}
+      snapshot={snapshot}
       activeView={activeView}
       isBusy={isBusy}
       searchQuery={searchQuery}
@@ -225,54 +268,21 @@ export default function App(): JSX.Element {
       }}
       onSettings={() => setView({ name: 'settings' })}
       onScan={handleScan}
+      onSelectSearchResult={(game) => {
+        setSearchQuery('')
+        openGame(game)
+      }}
+      onLaunchSearchResult={(game) => {
+        setSearchQuery('')
+        void handleLaunchGame(game)
+      }}
     >
-      {view.name === 'home' ? (
-        <HomeScreen
-          snapshot={displaySnapshot}
-          onOpenConsole={(consoleId) => setView({ name: 'console', consoleId })}
-          onOpenGame={openGame}
-          onLaunchGame={handleLaunchGame}
-        />
-      ) : null}
-
-      {view.name === 'console' ? (
-        <ConsoleScreen
-          consoleId={view.consoleId}
-          snapshot={displaySnapshot}
-          onOpenGame={openGame}
-          onLaunchGame={handleLaunchGame}
-          onOpenSettings={() => setView({ name: 'settings' })}
-        />
-      ) : null}
-
-      {view.name === 'game' && selectedGame ? (
-        <GameDetailsScreen
-          game={selectedGame}
-          snapshot={snapshot}
-          onBack={() => (view.returnTo ? setView({ name: 'console', consoleId: view.returnTo }) : setView({ name: 'home' }))}
-          onLaunch={handleLaunchGame}
-          onToggleFavorite={handleToggleFavorite}
-          onSearchCovers={handleSearchCovers}
-          onDownloadCover={handleDownloadCover}
-          onRevealPath={(filePath) => {
-            void retroApi.revealPath(filePath)
-          }}
-        />
-      ) : null}
-
-      {view.name === 'settings' ? (
-        <SettingsScreen
-          snapshot={snapshot}
-          isBusy={isBusy}
-          onDetect={handleDetect}
-          onScan={handleScan}
-          onSave={handleSaveEmulator}
-          onSaveMetadataSettings={handleSaveMetadataSettings}
-          onDownloadMissingCovers={handleDownloadMissingCovers}
-          onChooseExecutable={retroApi.chooseExecutable}
-          onChooseFolder={retroApi.chooseFolder}
-        />
-      ) : null}
+      <div
+        key={transitionKey}
+        className="animate-view-in"
+      >
+        {viewContent}
+      </div>
 
       <Toast message={toast?.message} tone={toast?.tone} onDismiss={() => setToast(undefined)} />
     </AppShell>
