@@ -101,9 +101,9 @@ export function AppShell({
               <Gamepad2 className="h-6 w-6" />
             </span>
             <span className="min-w-0">
-              <span className="block font-display text-xl font-bold text-white">RetroForge</span>
+              <span className="block font-display text-xl font-bold text-white">Sarkan Vault</span>
               <span className="block truncate text-xs font-semibold uppercase text-white/48">
-                Centro de comando arcade local
+                Centro de juegos de Leo y Edi
               </span>
             </span>
           </button>
@@ -153,19 +153,11 @@ export function AppShell({
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={onScan}
-              className="inline-flex h-11 items-center gap-2 rounded-md border border-white/10 bg-white/8 px-4 text-sm font-bold text-white transition hover:bg-white/14"
-            >
-              <RefreshCw className={`h-4 w-4 ${isBusy ? 'animate-spin' : ''}`} />
-              Escanear
-            </button>
-            <button
-              type="button"
               onClick={onSettings}
-              className="inline-flex h-11 items-center gap-2 rounded-md bg-white px-4 text-sm font-extrabold text-night transition hover:bg-mint"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-md bg-white/8 text-white transition hover:bg-white/14"
+              title="Configuración"
             >
               <Settings className="h-4 w-4" />
-              Configurar
             </button>
           </div>
         </header>

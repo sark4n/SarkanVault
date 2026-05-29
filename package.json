@@ -1,9 +1,9 @@
 {
-  "name": "retroforge-launcher",
+  "name": "sarkan-vault",
   "version": "0.1.0",
   "description": "A local Windows retro gaming launcher built with Electron, React, Vite, and TailwindCSS.",
   "main": "out/main/index.js",
-  "author": "RetroForge",
+  "author": "Sarkan Vault",
   "license": "MIT",
   "private": true,
   "type": "module",
@@ -36,8 +36,8 @@
     "vite": "5.4.11"
   },
   "build": {
-    "appId": "com.retroforge.launcher",
-    "productName": "RetroForge",
+    "appId": "com.sarkanvault.launcher",
+    "productName": "Sarkan Vault",
     "directories": {
       "output": "release"
     },

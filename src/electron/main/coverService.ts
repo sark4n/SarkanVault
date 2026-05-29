@@ -234,7 +234,7 @@ export class CoverService {
     url.searchParams.set('devpassword', settings.screenScraper.devPassword)
     url.searchParams.set('ssid', settings.screenScraper.userName)
     url.searchParams.set('sspassword', settings.screenScraper.password)
-    url.searchParams.set('softname', settings.screenScraper.softName || 'RetroForge')
+    url.searchParams.set('softname', settings.screenScraper.softName || 'Sarkan Vault')
     url.searchParams.set('output', 'json')
     url.searchParams.set('romtype', 'rom')
     url.searchParams.set('romnom', game.fileName || query)

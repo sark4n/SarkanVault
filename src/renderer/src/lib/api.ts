@@ -12,6 +12,7 @@ const previewConsoles: ConsoleDefinition[] = [
     colorTo: '#ff4f8b',
     accent: '#66d9ff',
     romExtensions: ['.gen', '.md', '.smd', '.bin', '.zip'],
+    imageUrl: 'https://images.pexels.com/photos/3719248/pexels-photo-3719248.jpeg?auto=compress&cs=tinysrgb&w=400',
     candidates: []
   },
   {
@@ -25,6 +26,7 @@ const previewConsoles: ConsoleDefinition[] = [
     colorTo: '#5cf2c4',
     accent: '#c4b5fd',
     romExtensions: ['.smc', '.sfc', '.fig', '.swc', '.zip'],
+    imageUrl: 'https://images.pexels.com/photos/3719248/pexels-photo-3719248.jpeg?auto=compress&cs=tinysrgb&w=400',
     candidates: []
   },
   {
@@ -38,6 +40,7 @@ const previewConsoles: ConsoleDefinition[] = [
     colorTo: '#f7d65b',
     accent: '#8df06f',
     romExtensions: ['.z64', '.n64', '.v64', '.zip'],
+    imageUrl: 'https://images.pexels.com/photos/3719248/pexels-photo-3719248.jpeg?auto=compress&cs=tinysrgb&w=400',
     candidates: []
   },
   {
@@ -51,6 +54,7 @@ const previewConsoles: ConsoleDefinition[] = [
     colorTo: '#ff8a4c',
     accent: '#ffd166',
     romExtensions: ['.bin', '.cue', '.iso', '.chd'],
+    imageUrl: 'https://images.pexels.com/photos/3719248/pexels-photo-3719248.jpeg?auto=compress&cs=tinysrgb&w=400',
     candidates: []
   },
   {
@@ -64,6 +68,7 @@ const previewConsoles: ConsoleDefinition[] = [
     colorTo: '#f7d65b',
     accent: '#ffb3cf',
     romExtensions: ['.gba', '.zip'],
+    imageUrl: 'https://images.pexels.com/photos/3719248/pexels-photo-3719248.jpeg?auto=compress&cs=tinysrgb&w=400',
     candidates: []
   },
   {
@@ -77,6 +82,7 @@ const previewConsoles: ConsoleDefinition[] = [
     colorTo: '#8aa0ff',
     accent: '#99f6e4',
     romExtensions: ['.nds', '.zip'],
+    imageUrl: 'https://images.pexels.com/photos/3719248/pexels-photo-3719248.jpeg?auto=compress&cs=tinysrgb&w=400',
     candidates: []
   }
 ]
@@ -217,7 +223,7 @@ function createPreviewSnapshot(): LibrarySnapshot {
         enabled: false,
         userName: '',
         devId: '',
-        softName: 'RetroForge',
+        softName: 'Sarkan Vault',
         hasPassword: false,
         hasDevPassword: false
       },

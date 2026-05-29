@@ -20,7 +20,7 @@ protocol.registerSchemesAsPrivileged([
   }
 ])
 
-app.setName('RetroForge')
+app.setName('Sarkan Vault')
 
 const store = new LocalStore()
 const scanner = new RomScanner(store)
@@ -33,7 +33,7 @@ async function createWindow(): Promise<void> {
     height: 940,
     minWidth: 1060,
     minHeight: 720,
-    title: 'RetroForge',
+    title: 'Sarkan Vault',
     backgroundColor: '#07080d',
     autoHideMenuBar: true,
     titleBarStyle: 'hidden',

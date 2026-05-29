@@ -1,6 +1,7 @@
 import { Flame, LibraryBig, Star, TimerReset } from 'lucide-react'
+import { useMemo } from 'react'
 import type { ConsoleId, GameEntry, LibrarySnapshot } from '@shared/types'
-import { getConsole, getEmulator, groupByConsole } from '@renderer/lib/format'
+import { getConsole, getEmulator, groupByConsole, groupByGenre, genreOrder, pickRandomRealGame, sortGames } from '@renderer/lib/format'
 import { ConsoleTile } from '@renderer/components/ConsoleTile'
 import { CoverFrame } from '@renderer/components/CoverFrame'
 import { GameCarousel } from '@renderer/components/GameCarousel'
@@ -19,12 +20,20 @@ export function HomeScreen({
   onLaunchGame
 }: HomeScreenProps): JSX.Element {
   const groupedGames = groupByConsole(snapshot.games)
-  const heroGame =
-    snapshot.recentlyPlayed[0] ?? snapshot.favorites[0] ?? snapshot.games.find((game) => game.source === 'sample') ?? snapshot.games[0]
+
+  const heroGame = useMemo(() => {
+    return pickRandomRealGame(snapshot.games) ?? snapshot.games[0]
+  }, [snapshot.games])
+
   const heroConsole = getConsole(snapshot.consoles, heroGame.consoleId)
   const continuePlaying = snapshot.recentlyPlayed.length ? snapshot.recentlyPlayed : snapshot.games.filter((game) => game.playCount > 0)
-  const featured = snapshot.games.filter((game) => game.favorite).slice(0, 14)
-  const allGames = snapshot.games.slice(0, 20)
+
+  const genreGroups = useMemo(() => {
+    const groups = groupByGenre(snapshot.games)
+    return genreOrder
+      .filter((genre) => groups.has(genre))
+      .map((genre) => ({ genre, games: groups.get(genre) ?? [] }))
+  }, [snapshot.games])
 
   return (
     <div className="space-y-10">
@@ -107,23 +116,19 @@ export function HomeScreen({
         onLaunchGame={onLaunchGame}
         compact
       />
-      <GameCarousel
-        title="Favoritos"
-        subtitle="Los juegos fijados están a un clic de distancia."
-        games={featured}
-        consoles={snapshot.consoles}
-        onOpenGame={onOpenGame}
-        onLaunchGame={onLaunchGame}
-      />
-      <GameCarousel
-        title="Añadidos Recientemente"
-        subtitle="ROMs escaneados recientemente y entradas de muestra."
-        games={allGames}
-        consoles={snapshot.consoles}
-        onOpenGame={onOpenGame}
-        onLaunchGame={onLaunchGame}
-        compact
-      />
+
+      {genreGroups.map(({ genre, games }) => (
+        <GameCarousel
+          key={genre}
+          title={genre}
+          subtitle={`${games.length} juegos en ${genre}`}
+          games={sortGames(games, 'title').slice(0, 18)}
+          consoles={snapshot.consoles}
+          onOpenGame={onOpenGame}
+          onLaunchGame={onLaunchGame}
+          compact
+        />
+      ))}
     </div>
   )
 }

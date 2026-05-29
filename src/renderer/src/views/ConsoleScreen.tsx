@@ -1,7 +1,7 @@
 import { Search, SlidersHorizontal, Star } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import type { ConsoleId, GameEntry, LibrarySnapshot } from '@shared/types'
-import { getConsole, getEmulator, shortPath, sortGames } from '@renderer/lib/format'
+import { getConsole, getEmulator, groupByGenre, genreOrder, shortPath, sortGames } from '@renderer/lib/format'
 import { GameCard } from '@renderer/components/GameCard'
 import { GameCarousel } from '@renderer/components/GameCarousel'
 
@@ -39,6 +39,13 @@ export function ConsoleScreen({
 
     return sortGames(visibleGames, sortMode)
   }, [consoleGames, favoritesOnly, query, sortMode])
+
+  const genreGroups = useMemo(() => {
+    const groups = groupByGenre(filteredGames)
+    return genreOrder
+      .filter((genre) => groups.has(genre))
+      .map((genre) => ({ genre, games: groups.get(genre) ?? [] }))
+  }, [filteredGames])
 
   return (
     <div className="space-y-8">
@@ -98,7 +105,7 @@ export function ConsoleScreen({
               onChange={(event) => setSortMode(event.target.value)}
               className="bg-transparent text-sm font-bold text-white outline-none"
             >
-              <option value="title">Título</option>
+              <option value="title">Alfabético (A-Z)</option>
               <option value="recent">Jugados recientemente</option>
               <option value="plays">Conteo de partidas</option>
             </select>
@@ -129,16 +136,26 @@ export function ConsoleScreen({
           <p className="mt-1 text-sm text-white/54">{filteredGames.length} entradas visibles</p>
         </div>
         {filteredGames.length ? (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-5">
-            {filteredGames.map((game) => (
-              <GameCard
-                key={game.id}
-                game={game}
-                consoleDef={consoleDef}
-                onOpen={onOpenGame}
-                onLaunch={onLaunchGame}
-                compact
-              />
+          <div className="space-y-8">
+            {genreGroups.map(({ genre, games }) => (
+              <div key={genre}>
+                <div className="mb-3 flex items-center gap-3">
+                  <h3 className="text-lg font-bold text-white/78">{genre}</h3>
+                  <span className="text-xs text-white/38">{games.length} juegos</span>
+                </div>
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-5">
+                  {games.map((game) => (
+                    <GameCard
+                      key={game.id}
+                      game={game}
+                      consoleDef={consoleDef}
+                      onOpen={onOpenGame}
+                      onLaunch={onLaunchGame}
+                      compact
+                    />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         ) : (

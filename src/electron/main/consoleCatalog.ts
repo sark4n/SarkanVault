@@ -12,6 +12,7 @@ export const consoleCatalog: ConsoleDefinition[] = [
     colorTo: '#ff4f8b',
     accent: '#66d9ff',
     romExtensions: ['.gen', '.md', '.smd', '.bin', '.zip'],
+    imageUrl: 'https://images.pexels.com/photos/3719248/pexels-photo-3719248.jpeg?auto=compress&cs=tinysrgb&w=400',
     candidates: [
       {
         name: 'Kega Fusion',
@@ -45,6 +46,7 @@ export const consoleCatalog: ConsoleDefinition[] = [
     colorTo: '#5cf2c4',
     accent: '#c4b5fd',
     romExtensions: ['.smc', '.sfc', '.fig', '.swc', '.zip'],
+    imageUrl: 'https://images.pexels.com/photos/3719248/pexels-photo-3719248.jpeg?auto=compress&cs=tinysrgb&w=400',
     candidates: [
       {
         name: 'Snes9x',
@@ -78,6 +80,7 @@ export const consoleCatalog: ConsoleDefinition[] = [
     colorTo: '#f7d65b',
     accent: '#8df06f',
     romExtensions: ['.z64', '.n64', '.v64', '.rom', '.zip'],
+    imageUrl: 'https://images.pexels.com/photos/3719248/pexels-photo-3719248.jpeg?auto=compress&cs=tinysrgb&w=400',
     candidates: [
       {
         name: 'Project64',
@@ -111,6 +114,7 @@ export const consoleCatalog: ConsoleDefinition[] = [
     colorTo: '#ff8a4c',
     accent: '#ffd166',
     romExtensions: ['.bin', '.cue', '.iso', '.img', '.chd', '.pbp', '.m3u'],
+    imageUrl: 'https://images.pexels.com/photos/3719248/pexels-photo-3719248.jpeg?auto=compress&cs=tinysrgb&w=400',
     candidates: [
       {
         name: 'DuckStation',
@@ -144,6 +148,7 @@ export const consoleCatalog: ConsoleDefinition[] = [
     colorTo: '#f7d65b',
     accent: '#ffb3cf',
     romExtensions: ['.gba', '.agb', '.zip'],
+    imageUrl: 'https://images.pexels.com/photos/3719248/pexels-photo-3719248.jpeg?auto=compress&cs=tinysrgb&w=400',
     candidates: [
       {
         name: 'mGBA',
@@ -177,6 +182,7 @@ export const consoleCatalog: ConsoleDefinition[] = [
     colorTo: '#8aa0ff',
     accent: '#99f6e4',
     romExtensions: ['.nds', '.dsi', '.zip'],
+    imageUrl: 'https://images.pexels.com/photos/3719248/pexels-photo-3719248.jpeg?auto=compress&cs=tinysrgb&w=400',
     candidates: [
       {
         name: 'melonDS',

@@ -30,6 +30,7 @@ export interface ConsoleDefinition {
   accent: string
   romExtensions: string[]
   candidates: EmulatorCandidate[]
+  imageUrl?: string
 }
 
 export interface EmulatorConfig {
@@ -59,6 +60,7 @@ export interface GameEntry {
   addedAt: string
   updatedAt: string
   source: GameSource
+  genre?: string
 }
 
 export interface SteamGridDbSettings {

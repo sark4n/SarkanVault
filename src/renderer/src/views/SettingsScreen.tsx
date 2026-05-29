@@ -451,7 +451,7 @@ function createMetadataDraft(snapshot: LibrarySnapshot): MetadataSettings {
       password: '',
       devId: snapshot.metadataSettings.screenScraper.devId,
       devPassword: '',
-      softName: snapshot.metadataSettings.screenScraper.softName || 'RetroForge'
+      softName: snapshot.metadataSettings.screenScraper.softName || 'Sarkan Vault'
     },
     preferProvider: snapshot.metadataSettings.preferProvider
   }

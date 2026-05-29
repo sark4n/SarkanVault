@@ -245,7 +245,7 @@ export function createDefaultMetadataSettings(): MetadataSettings {
       password: '',
       devId: '',
       devPassword: '',
-      softName: 'RetroForge'
+      softName: 'Sarkan Vault'
     },
     preferProvider: 'steamgriddb'
   }
@@ -294,7 +294,7 @@ function normalizeMetadataSettings(settings: MetadataSettings): MetadataSettings
       password: settings.screenScraper?.password ?? '',
       devId: settings.screenScraper?.devId?.trim() ?? '',
       devPassword: settings.screenScraper?.devPassword ?? '',
-      softName: settings.screenScraper?.softName?.trim() || 'RetroForge'
+      softName: settings.screenScraper?.softName?.trim() || 'Sarkan Vault'
     },
     preferProvider: settings.preferProvider === 'screenscraper' ? 'screenscraper' : 'steamgriddb'
   }

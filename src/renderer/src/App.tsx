@@ -196,7 +196,7 @@ export default function App(): JSX.Element {
       <div className="grid min-h-screen place-items-center bg-night text-white">
         <div className="rounded-lg border border-white/8 bg-white/[0.045] p-8 text-center shadow-card">
           <div className="mx-auto mb-5 h-12 w-12 animate-spin rounded-full border-2 border-white/20 border-t-mint" />
-          <p className="text-sm font-bold uppercase text-white/54">Cargando RetroForge</p>
+          <p className="text-sm font-bold uppercase text-white/54">Cargando Sarkan Vault</p>
         </div>
       </div>
     )

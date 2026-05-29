@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Gamepad2, Play } from 'lucide-react'
 import type { ConsoleDefinition, GameEntry } from '@shared/types'
-import { getConsole } from '@renderer/lib/format'
+import { getConsole, inferGenre } from '@renderer/lib/format'
 
 interface SearchDropdownProps {
   query: string
@@ -25,7 +25,16 @@ export function SearchDropdown({
   const [activeIndex, setActiveIndex] = useState(0)
   const listRef = useRef<HTMLDivElement>(null)
 
-  const results = query.trim() ? games.slice(0, 8) : []
+  const normalizedQuery = query.trim().toLowerCase()
+  const results = normalizedQuery
+    ? games.filter((game) => {
+        const matchesTitle = game.title.toLowerCase().includes(normalizedQuery)
+        const matchesGenre = inferGenre(game).toLowerCase().includes(normalizedQuery)
+        const consoleDef = getConsole(consoles, game.consoleId)
+        const matchesConsole = consoleDef.shortName.toLowerCase().includes(normalizedQuery) || consoleDef.name.toLowerCase().includes(normalizedQuery)
+        return matchesTitle || matchesGenre || matchesConsole
+      }).slice(0, 8)
+    : []
 
   useEffect(() => {
     setActiveIndex(0)
@@ -52,7 +61,7 @@ export function SearchDropdown({
 
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [visible, results, activeIndex, onSelect, onLaunch, onClose])
+  }, [visible, results, activeIndex, onSelect, onClose])
 
   useEffect(() => {
     if (listRef.current) {
@@ -76,6 +85,7 @@ export function SearchDropdown({
       <div ref={listRef} className="max-h-[420px] overflow-y-auto py-2">
         {results.map((game, index) => {
           const consoleDef = getConsole(consoles, game.consoleId)
+          const genre = inferGenre(game)
           const isActive = index === activeIndex
 
           return (
@@ -100,7 +110,7 @@ export function SearchDropdown({
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold text-white">{game.title}</p>
-                <p className="text-xs text-white/44">{consoleDef.shortName}</p>
+                <p className="text-xs text-white/44">{consoleDef.shortName} · {genre}</p>
               </div>
               <button
                 type="button"
