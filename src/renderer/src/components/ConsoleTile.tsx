@@ -2,7 +2,13 @@ import { ChevronRight } from 'lucide-react'
 import type { ConsoleDefinition, EmulatorConfig, GameEntry } from '@shared/types'
 import { isConfigured } from '@renderer/lib/format'
 
-const Buffer = window.Buffer || require('buffer').Buffer
+function toMediaUrl(filePath: string): string {
+  const encoded = btoa(unescape(encodeURIComponent(filePath)))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '')
+  return `retro-media://local/${encoded}`
+}
 
 interface ConsoleTileProps {
   consoleDef: ConsoleDefinition
@@ -23,7 +29,7 @@ export function ConsoleTile({ consoleDef, games, config, onOpen }: ConsoleTilePr
       {imageUrl ? (
         <>
           <img
-            src={imageUrl.startsWith('http') ? imageUrl : `retro-media://local/${Buffer.from(imageUrl, 'utf8').toString('base64url')}`}
+            src={imageUrl.startsWith('http') ? imageUrl : toMediaUrl(imageUrl)}
             alt={consoleDef.name}
             className="absolute inset-0 h-full w-full object-cover"
           />

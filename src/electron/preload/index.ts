@@ -20,3 +20,15 @@ const api: RetroLauncherApi = {
 }
 
 contextBridge.exposeInMainWorld('retroLauncher', api)
+
+contextBridge.exposeInMainWorld('windowControls', {
+  minimize: () => ipcRenderer.invoke('window:minimize'),
+  maximize: () => ipcRenderer.invoke('window:maximize'),
+  close: () => ipcRenderer.invoke('window:close'),
+  isMaximized: () => ipcRenderer.invoke('window:isMaximized'),
+  onMaximizeChange: (callback: (isMaximized: boolean) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, value: boolean) => callback(value)
+    ipcRenderer.on('window:maximizeChanged', handler)
+    return () => ipcRenderer.removeListener('window:maximizeChanged', handler)
+  }
+})

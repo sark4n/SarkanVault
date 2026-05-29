@@ -51,6 +51,14 @@ async function createWindow(): Promise<void> {
     mainWindow.show()
   })
 
+  mainWindow.on('maximize', () => {
+    mainWindow.webContents.send('window:maximizeChanged', true)
+  })
+
+  mainWindow.on('unmaximize', () => {
+    mainWindow.webContents.send('window:maximizeChanged', false)
+  })
+
   if (process.env.ELECTRON_RENDERER_URL) {
     await mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL)
   } else {
@@ -149,6 +157,29 @@ function registerIpc(): void {
 
   ipcMain.handle('shell:revealPath', async (_event, targetPath: string) => {
     if (targetPath) shell.showItemInFolder(targetPath)
+  })
+
+  ipcMain.handle('window:minimize', async (event) => {
+    BrowserWindow.fromWebContents(event.sender)?.minimize()
+  })
+
+  ipcMain.handle('window:maximize', async (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender)
+    if (!win) return
+    if (win.isMaximized()) {
+      win.unmaximize()
+    } else {
+      win.maximize()
+    }
+  })
+
+  ipcMain.handle('window:close', async (event) => {
+    BrowserWindow.fromWebContents(event.sender)?.close()
+  })
+
+  ipcMain.handle('window:isMaximized', async (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender)
+    return win?.isMaximized() ?? false
   })
 }
 
