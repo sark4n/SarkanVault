@@ -1,6 +1,6 @@
 import { Clock3, Play, Star } from 'lucide-react'
 import type { ConsoleDefinition, GameEntry } from '@shared/types'
-import { formatDate } from '@renderer/lib/format'
+import { formatDate, inferGenre } from '@renderer/lib/format'
 import { CoverFrame } from './CoverFrame'
 
 interface GameCardProps {
@@ -12,24 +12,27 @@ interface GameCardProps {
 }
 
 export function GameCard({ game, consoleDef, onOpen, onLaunch, compact = false }: GameCardProps): JSX.Element {
+  const genre = inferGenre(game)
+  const cardWidth = compact ? 'w-[184px]' : 'w-[240px]'
+  const coverAspect = compact ? 'aspect-[3/4]' : 'aspect-[2/3]'
+
   return (
     <article
-      className={`group relative shrink-0 overflow-hidden rounded-lg border border-white/8 bg-white/[0.045] shadow-card transition duration-300 hover:-translate-y-2 hover:border-white/22 hover:bg-white/[0.075] ${
-        compact ? 'w-[164px]' : 'w-[212px]'
-      }`}
+      className={`group relative shrink-0 overflow-hidden rounded-lg border border-white/8 bg-white/[0.045] shadow-card transition duration-300 hover:-translate-y-2 hover:border-white/22 hover:bg-white/[0.075] ${cardWidth}`}
     >
       <button
         type="button"
         onClick={() => onOpen(game)}
         className="block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-mint"
       >
-        <div className="aspect-[2/3] overflow-hidden rounded-t-lg">
+        <div className={`${coverAspect} overflow-hidden rounded-t-lg`}>
           <CoverFrame game={game} consoleDef={consoleDef} />
         </div>
       </button>
       <div className="space-y-3 p-4">
         <button type="button" onClick={() => onOpen(game)} className="block w-full text-left">
           <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-bold leading-5 text-white">{game.title}</h3>
+          <p className="mt-1 text-xs font-semibold text-white/46">{consoleDef.shortName} · {genre}</p>
         </button>
         <div className="flex items-center justify-between gap-3 text-xs text-white/50">
           <span className="inline-flex min-w-0 items-center gap-1.5">

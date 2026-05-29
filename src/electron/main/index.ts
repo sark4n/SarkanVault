@@ -124,6 +124,18 @@ function registerIpc(): void {
     return result.canceled ? undefined : result.filePaths[0]
   })
 
+  ipcMain.handle('dialog:chooseImage', async (event) => {
+    const window = BrowserWindow.fromWebContents(event.sender)
+    const options = {
+      title: 'Choose console image',
+      properties: ['openFile'],
+      filters: [{ name: 'Image', extensions: ['jpg', 'jpeg', 'png', 'webp'] }]
+    } satisfies Electron.OpenDialogOptions
+    const result = window ? await dialog.showOpenDialog(window, options) : await dialog.showOpenDialog(options)
+
+    return result.canceled ? undefined : result.filePaths[0]
+  })
+
   ipcMain.handle('games:launch', async (_event, gameId: string) => {
     const result = await launcher.launch(gameId)
     const snapshot = await store.getSnapshot()

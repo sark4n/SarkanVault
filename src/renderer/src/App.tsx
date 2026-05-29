@@ -250,6 +250,7 @@ export default function App(): JSX.Element {
         onSaveMetadataSettings={handleSaveMetadataSettings}
         onDownloadMissingCovers={handleDownloadMissingCovers}
         onChooseExecutable={retroApi.chooseExecutable}
+        onChooseImage={retroApi.chooseImage}
         onChooseFolder={retroApi.chooseFolder}
       />
     )

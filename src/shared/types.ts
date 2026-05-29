@@ -42,6 +42,7 @@ export interface EmulatorConfig {
   supportedExtensions: string[]
   launchArguments: string
   retroArchCorePath: string
+  consoleImageUrl?: string
   updatedAt?: string
 }
 
@@ -192,6 +193,7 @@ export interface RetroLauncherApi {
     limit?: number
   ) => Promise<{ snapshot: LibrarySnapshot; summary: MissingCoverSummary }>
   chooseExecutable: () => Promise<string | undefined>
+  chooseImage: () => Promise<string | undefined>
   chooseFolder: () => Promise<string | undefined>
   launchGame: (gameId: string) => Promise<{ snapshot: LibrarySnapshot; result: LaunchResult }>
   toggleFavorite: (gameId: string) => Promise<LibrarySnapshot>

@@ -95,20 +95,20 @@ export function AppShell({
       </aside>
 
       <main className="relative z-10 min-h-screen px-5 pb-14 pt-5 lg:pl-[124px] lg:pr-8">
-        <header className="mb-8 flex items-center justify-between gap-5 rounded-lg border border-white/8 bg-white/[0.045] px-5 py-4 backdrop-blur-2xl">
-          <button type="button" onClick={onHome} className="flex min-w-0 items-center gap-4 text-left">
+        <header className="mb-8 flex items-center gap-5 rounded-lg border border-white/8 bg-white/[0.045] px-5 py-4 backdrop-blur-2xl">
+          <button type="button" onClick={onHome} className="flex shrink-0 items-center gap-4 text-left">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-white text-night">
               <Gamepad2 className="h-6 w-6" />
             </span>
-            <span className="min-w-0">
+            <span className="hidden sm:block">
               <span className="block font-display text-xl font-bold text-white">Sarkan Vault</span>
               <span className="block truncate text-xs font-semibold uppercase text-white/48">
                 Centro de juegos de Leo y Edi
               </span>
             </span>
           </button>
-          <div className="relative hidden min-w-0 flex-1 items-center justify-center md:flex">
-            <div className="flex h-11 w-full max-w-xl items-center gap-3 rounded-md border border-white/8 bg-black/20 px-4">
+          <div className="relative min-w-0 flex-1">
+            <div className="flex h-11 w-full items-center gap-3 rounded-md border border-white/8 bg-black/20 px-4">
               <Search className="h-4 w-4 shrink-0 text-white/38" />
               <input
                 ref={inputRef}
@@ -150,16 +150,14 @@ export function AppShell({
               onClick={clearSearch}
             />
           )}
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={onSettings}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-md bg-white/8 text-white transition hover:bg-white/14"
-              title="Configuración"
-            >
-              <Settings className="h-4 w-4" />
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={onSettings}
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-white/8 text-white transition hover:bg-white/14"
+            title="Configuración"
+          >
+            <Settings className="h-4 w-4" />
+          </button>
         </header>
 
         {snapshot.sampleMode ? (

@@ -22,5 +22,7 @@ export function registerMediaProtocol(): void {
 
 export function toMediaUrl(filePath?: string): string | undefined {
   if (!filePath) return undefined
-  return `retro-media://local/${Buffer.from(filePath, 'utf8').toString('base64url')}`
+  const encoded = Buffer.from(filePath, 'utf8').toString('base64url')
+  const cacheBuster = Date.now()
+  return `retro-media://local/${encoded}?v=${cacheBuster}`
 }

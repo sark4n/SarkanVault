@@ -1,4 +1,4 @@
-import { Cloud, Cpu, Database, Download, FolderOpen, RefreshCw, Save, Search, Settings2 } from 'lucide-react'
+import { Cloud, Cpu, Database, Download, FolderOpen, Image, RefreshCw, Save, Search, Settings2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import type { ConsoleId, EmulatorConfig, LibrarySnapshot, MetadataSettings } from '@shared/types'
 import { getConsole, shortPath } from '@renderer/lib/format'
@@ -12,6 +12,7 @@ interface SettingsScreenProps {
   onSaveMetadataSettings: (settings: MetadataSettings) => Promise<void>
   onDownloadMissingCovers: (consoleId?: ConsoleId) => Promise<void>
   onChooseExecutable: () => Promise<string | undefined>
+  onChooseImage: () => Promise<string | undefined>
   onChooseFolder: () => Promise<string | undefined>
 }
 
@@ -24,6 +25,7 @@ export function SettingsScreen({
   onSaveMetadataSettings,
   onDownloadMissingCovers,
   onChooseExecutable,
+  onChooseImage,
   onChooseFolder
 }: SettingsScreenProps): JSX.Element {
   const [drafts, setDrafts] = useState<Record<string, EmulatorConfig>>({})
@@ -63,6 +65,11 @@ export function SettingsScreen({
   const chooseFolder = async (field: 'romFolderPath' | 'coverFolderPath'): Promise<void> => {
     const folderPath = await onChooseFolder()
     if (folderPath) updateDraft(selectedConsoleId, { [field]: folderPath })
+  }
+
+  const chooseConsoleImage = async (): Promise<void> => {
+    const imagePath = await onChooseImage()
+    if (imagePath) updateDraft(selectedConsoleId, { consoleImageUrl: imagePath })
   }
 
   if (!selectedDraft) {
@@ -327,6 +334,13 @@ export function SettingsScreen({
               onChange={(value) => updateDraft(selectedConsoleId, { coverFolderPath: value })}
               onBrowse={() => chooseFolder('coverFolderPath')}
               placeholder="D:\\ROMs\\SNES\\Caratulas"
+            />
+            <PathField
+              label="Imagen de la consola"
+              value={selectedDraft.consoleImageUrl || ''}
+              onChange={(value) => updateDraft(selectedConsoleId, { consoleImageUrl: value })}
+              onBrowse={chooseConsoleImage}
+              placeholder="Selecciona una imagen para mostrar en el tile de consola"
             />
             <Field
               label="Extensiones de ROM soportadas"

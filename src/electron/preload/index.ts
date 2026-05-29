@@ -12,6 +12,7 @@ const api: RetroLauncherApi = {
   downloadMissingCovers: (consoleId?: ConsoleId, limit?: number) =>
     ipcRenderer.invoke('covers:downloadMissing', consoleId, limit),
   chooseExecutable: () => ipcRenderer.invoke('dialog:chooseExecutable'),
+  chooseImage: () => ipcRenderer.invoke('dialog:chooseImage'),
   chooseFolder: () => ipcRenderer.invoke('dialog:chooseFolder'),
   launchGame: (gameId: string) => ipcRenderer.invoke('games:launch', gameId),
   toggleFavorite: (gameId: string) => ipcRenderer.invoke('games:toggleFavorite', gameId),

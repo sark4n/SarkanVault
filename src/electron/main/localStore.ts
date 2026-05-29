@@ -276,6 +276,7 @@ function normalizeConfig(config: EmulatorConfig): EmulatorConfig {
     romFolderPath: config.romFolderPath?.trim() ?? '',
     coverFolderPath: config.coverFolderPath?.trim() ?? '',
     retroArchCorePath: config.retroArchCorePath?.trim() ?? '',
+    consoleImageUrl: config.consoleImageUrl?.trim() ?? '',
     launchArguments: config.launchArguments?.trim() || '"{rom}"',
     supportedExtensions: [...new Set((config.supportedExtensions ?? []).map(normalizeExtension))],
     updatedAt: new Date().toISOString()

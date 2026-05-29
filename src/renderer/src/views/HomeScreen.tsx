@@ -37,7 +37,7 @@ export function HomeScreen({
 
   return (
     <div className="space-y-10">
-      <section className="relative min-h-[460px] overflow-hidden rounded-lg border border-white/8 bg-white/[0.045] shadow-card">
+      <section className="relative min-h-[520px] overflow-hidden rounded-lg border border-white/8 bg-white/[0.045] shadow-card">
         <div
           className="absolute inset-0"
           style={{
@@ -45,43 +45,43 @@ export function HomeScreen({
           }}
         />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_22%,rgba(255,255,255,0.26),transparent_30%),linear-gradient(90deg,rgba(7,8,13,0.94)_0%,rgba(7,8,13,0.62)_46%,rgba(7,8,13,0.12)_100%)]" />
-        <div className="relative grid min-h-[460px] grid-cols-1 gap-8 p-7 md:grid-cols-[1.1fr_0.9fr] md:p-10">
+        <div className="relative grid min-h-[520px] grid-cols-1 gap-8 p-8 md:grid-cols-[1fr_400px] md:p-10 lg:grid-cols-[1fr_480px]">
           <div className="flex max-w-3xl flex-col justify-center">
             <div className="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-white/14 bg-black/24 px-4 py-2 text-xs font-extrabold uppercase text-white/70 backdrop-blur-xl">
               <Flame className="h-4 w-4 text-ember" />
               Destacado localmente
             </div>
-            <h1 className="font-display text-5xl font-bold leading-[1.03] text-white md:text-7xl">{heroGame.title}</h1>
+            <h1 className="font-display text-5xl font-bold leading-[1.03] text-white md:text-6xl lg:text-7xl">{heroGame.title}</h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-white/68">{heroConsole.description}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <button
                 type="button"
                 onClick={() => onLaunchGame(heroGame)}
-                className="inline-flex h-12 items-center gap-2 rounded-md bg-white px-6 text-sm font-extrabold text-night transition hover:bg-mint"
+                className="inline-flex h-14 items-center gap-3 rounded-lg bg-white px-8 text-base font-extrabold text-night transition hover:bg-mint"
               >
                 Ejecutar juego
               </button>
               <button
                 type="button"
                 onClick={() => onOpenGame(heroGame)}
-                className="inline-flex h-12 items-center gap-2 rounded-md border border-white/14 bg-white/8 px-6 text-sm font-bold text-white transition hover:bg-white/14"
+                className="inline-flex h-14 items-center gap-3 rounded-lg border border-white/14 bg-white/8 px-8 text-base font-bold text-white transition hover:bg-white/14"
               >
                 Detalles
               </button>
             </div>
-            <div className="mt-8 grid max-w-2xl grid-cols-3 gap-3">
-              <HeroStat icon={<LibraryBig className="h-4 w-4" />} label="Juegos" value={snapshot.stats.totalGames || snapshot.games.length} />
-              <HeroStat icon={<Star className="h-4 w-4" />} label="Favoritos" value={snapshot.favorites.length} />
-              <HeroStat icon={<TimerReset className="h-4 w-4" />} label="Recientes" value={snapshot.recentlyPlayed.length} />
+            <div className="mt-10 grid max-w-2xl grid-cols-3 gap-4">
+              <HeroStat icon={<LibraryBig className="h-5 w-5" />} label="Juegos" value={snapshot.stats.totalGames || snapshot.games.length} />
+              <HeroStat icon={<Star className="h-5 w-5" />} label="Favoritos" value={snapshot.favorites.length} />
+              <HeroStat icon={<TimerReset className="h-5 w-5" />} label="Recientes" value={snapshot.recentlyPlayed.length} />
             </div>
           </div>
           <button
             type="button"
             onClick={() => onOpenGame(heroGame)}
-            className="group mx-auto flex w-full max-w-[340px] items-center self-center overflow-hidden rounded-lg border border-white/16 bg-black/24 p-3 shadow-card backdrop-blur-2xl transition hover:-translate-y-2 hover:border-white/28"
+            className="group mx-auto flex w-full max-w-[480px] items-center self-center overflow-hidden rounded-xl border border-white/16 bg-black/24 p-4 shadow-card backdrop-blur-2xl transition hover:-translate-y-2 hover:border-white/28"
           >
-            <div className="aspect-[2/3] w-full overflow-hidden rounded-md">
-              <CoverFrame game={heroGame} consoleDef={heroConsole} priority />
+            <div className="aspect-[2/3] w-full overflow-hidden rounded-lg">
+              <CoverFrame game={heroGame} consoleDef={heroConsole} priority className="w-full h-full" />
             </div>
           </button>
         </div>
@@ -141,12 +141,12 @@ interface HeroStatProps {
 
 function HeroStat({ icon, label, value }: HeroStatProps): JSX.Element {
   return (
-    <div className="rounded-lg border border-white/10 bg-black/20 p-4 backdrop-blur-xl">
+    <div className="rounded-lg border border-white/10 bg-black/20 p-5 backdrop-blur-xl">
       <div className="flex items-center gap-2 text-white/54">
         {icon}
         <span className="text-xs font-extrabold uppercase">{label}</span>
       </div>
-      <p className="mt-2 font-display text-3xl font-bold text-white">{value}</p>
+      <p className="mt-3 font-display text-4xl font-bold text-white">{value}</p>
     </div>
   )
 }

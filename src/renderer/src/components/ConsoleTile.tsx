@@ -2,6 +2,8 @@ import { ChevronRight } from 'lucide-react'
 import type { ConsoleDefinition, EmulatorConfig, GameEntry } from '@shared/types'
 import { isConfigured } from '@renderer/lib/format'
 
+const Buffer = window.Buffer || require('buffer').Buffer
+
 interface ConsoleTileProps {
   consoleDef: ConsoleDefinition
   games: GameEntry[]
@@ -10,16 +12,18 @@ interface ConsoleTileProps {
 }
 
 export function ConsoleTile({ consoleDef, games, config, onOpen }: ConsoleTileProps): JSX.Element {
+  const imageUrl = config?.consoleImageUrl || consoleDef.imageUrl
+
   return (
     <button
       type="button"
       onClick={onOpen}
       className="group relative min-h-[180px] overflow-hidden rounded-lg border border-white/8 p-5 text-left shadow-card transition duration-300 hover:-translate-y-1 hover:border-white/24 focus:outline-none focus-visible:ring-2 focus-visible:ring-mint"
     >
-      {consoleDef.imageUrl ? (
+      {imageUrl ? (
         <>
           <img
-            src={consoleDef.imageUrl}
+            src={imageUrl.startsWith('http') ? imageUrl : `retro-media://local/${Buffer.from(imageUrl, 'utf8').toString('base64url')}`}
             alt={consoleDef.name}
             className="absolute inset-0 h-full w-full object-cover"
           />
