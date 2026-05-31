@@ -52,8 +52,8 @@ select option {
 }
 
 ::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -80,17 +80,57 @@ select option {
   scroll-snap-align: start;
 }
 
+/* ── View transition ─────────────────────────────── */
 @keyframes view-in {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0);    }
 }
 
 .animate-view-in {
-  animation: view-in 0.28s ease-out;
+  animation: view-in 0.24s ease-out;
+}
+
+/* ── Cursor hide in console / gamepad mode ───────── */
+html.cursor-hidden,
+html.cursor-hidden * {
+  cursor: none !important;
+}
+
+/* ── Gamepad focus ring ──────────────────────────── */
+/* Applied when the user is navigating with a controller */
+body.gamepad-mode :focus {
+  outline: 2px solid #5cf2c4 !important;
+  outline-offset: 3px !important;
+  border-radius: 6px;
+}
+
+body.gamepad-mode :focus:not(:focus-visible) {
+  outline: 2px solid #5cf2c4 !important;
+}
+
+/* Default: only show focus ring for keyboard */
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid #5cf2c4;
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ── Gamepad hint overlay (fullscreen console mode) ─ */
+.gamepad-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(8px);
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  user-select: none;
 }

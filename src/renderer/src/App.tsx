@@ -6,11 +6,13 @@ import type {
   EmulatorConfig,
   GameEntry,
   LibrarySnapshot,
-  MetadataSettings
+  MetadataSettings,
 } from '@shared/types'
 import { AppShell } from '@renderer/components/AppShell'
 import { Toast } from '@renderer/components/Toast'
 import { retroApi } from '@renderer/lib/api'
+import { useGamepad } from '@renderer/hooks/useGamepad'
+import { gamepadManager } from '@renderer/lib/gamepadManager'
 import { ConsoleScreen } from '@renderer/views/ConsoleScreen'
 import { GameDetailsScreen } from '@renderer/views/GameDetailsScreen'
 import { HomeScreen } from '@renderer/views/HomeScreen'
@@ -36,26 +38,31 @@ export default function App(): JSX.Element {
   const [toast, setToast] = useState<ToastState>()
   const [transitionKey, setTransitionKey] = useState(0)
   const prevViewName = useRef<string>(view.name)
+  const viewRef = useRef<View>(view)
+  const snapshotRef = useRef<LibrarySnapshot | undefined>(snapshot)
+
+  useEffect(() => { viewRef.current = view }, [view])
+  useEffect(() => { snapshotRef.current = snapshot }, [snapshot])
 
   const showToast = useCallback((message: string, tone: ToastState['tone'] = 'info') => {
     setToast({ message, tone })
   }, [])
 
   const refreshSnapshot = useCallback(async () => {
-    const nextSnapshot = await retroApi.getSnapshot()
-    setSnapshot(nextSnapshot)
+    const next = await retroApi.getSnapshot()
+    setSnapshot(next)
   }, [])
 
   useEffect(() => {
-    refreshSnapshot().catch((error) => {
-      showToast(error instanceof Error ? error.message : 'Error al cargar la biblioteca local.', 'error')
+    refreshSnapshot().catch((err) => {
+      showToast(err instanceof Error ? err.message : 'Error al cargar la biblioteca.', 'error')
     })
   }, [refreshSnapshot, showToast])
 
   useEffect(() => {
-    if (!toast) return undefined
-    const timeoutId = window.setTimeout(() => setToast(undefined), 5200)
-    return () => window.clearTimeout(timeoutId)
+    if (!toast) return
+    const id = window.setTimeout(() => setToast(undefined), 5200)
+    return () => window.clearTimeout(id)
   }, [toast])
 
   useEffect(() => {
@@ -65,139 +72,128 @@ export default function App(): JSX.Element {
     }
   }, [view.name])
 
-  const selectedGame = useMemo(() => {
-    if (!snapshot || view.name !== 'game') return undefined
-    return snapshot.games.find((game) => game.id === view.gameId)
-  }, [snapshot, view])
-
-  const withBusy = useCallback(
-    async (task: () => Promise<void>) => {
-      setIsBusy(true)
-      try {
-        await task()
-      } finally {
-        setIsBusy(false)
-      }
-    },
-    []
-  )
+  const withBusy = useCallback(async (task: () => Promise<void>) => {
+    setIsBusy(true)
+    try { await task() } finally { setIsBusy(false) }
+  }, [])
 
   const handleScan = useCallback(async () => {
     await withBusy(async () => {
       const result = await retroApi.scanLibrary()
       setSnapshot(result.snapshot)
-      showToast(`Escaneo completado. Se encontraron ${result.summary.totalGames} juegos locales.`, 'success')
-    }).catch((error) => {
-      showToast(error instanceof Error ? error.message : 'Error al escanear la biblioteca.', 'error')
-    })
+      showToast(`Escaneo completado. ${result.summary.totalGames} juegos encontrados.`, 'success')
+    }).catch((err) => showToast(err instanceof Error ? err.message : 'Error al escanear.', 'error'))
   }, [showToast, withBusy])
 
   const handleDetect = useCallback(async () => {
     await withBusy(async () => {
       const result = await retroApi.detectEmulators()
       setSnapshot(result.snapshot)
-      const message = result.detections.length
-        ? `Se detectaron ${result.detections.length} configuracion${result.detections.length === 1 ? '' : 'es'} de emulador.`
-        : 'No se detectaron emuladores instalados automáticamente. Todavía puedes configurar las rutas manualmente.'
-      showToast(message, result.detections.length ? 'success' : 'info')
-    }).catch((error) => {
-      showToast(error instanceof Error ? error.message : 'Error al detectar emuladores.', 'error')
+      const n = result.detections.length
+      showToast(n ? `Se detectaron ${n} emulador${n > 1 ? 'es' : ''}.` : 'No se detectaron emuladores automáticamente.', n ? 'success' : 'info')
+    }).catch((err) => showToast(err instanceof Error ? err.message : 'Error al detectar.', 'error'))
+  }, [showToast, withBusy])
+
+  const handleSaveEmulator = useCallback(async (config: EmulatorConfig) => {
+    await withBusy(async () => {
+      const next = await retroApi.saveEmulator(config)
+      setSnapshot(next)
+      showToast('Configuración guardada.', 'success')
+    }).catch((err) => showToast(err instanceof Error ? err.message : 'Error al guardar.', 'error'))
+  }, [showToast, withBusy])
+
+  const handleSaveMetadataSettings = useCallback(async (settings: MetadataSettings) => {
+    await withBusy(async () => {
+      const next = await retroApi.saveMetadataSettings(settings)
+      setSnapshot(next)
+      showToast('Configuración de carátulas guardada.', 'success')
+    }).catch((err) => showToast(err instanceof Error ? err.message : 'Error al guardar.', 'error'))
+  }, [showToast, withBusy])
+
+  const handleLaunchGame = useCallback(async (game: GameEntry) => {
+    const result = await retroApi.launchGame(game.id)
+    setSnapshot(result.snapshot)
+    showToast(result.result.message, result.result.ok ? 'success' : 'error')
+  }, [showToast])
+
+  const handleToggleFavorite = useCallback(async (game: GameEntry) => {
+    const next = await retroApi.toggleFavorite(game.id)
+    setSnapshot(next)
+    showToast(game.favorite ? 'Eliminado de favoritos.' : 'Añadido a favoritos.', 'success')
+  }, [showToast])
+
+  const handleSearchCovers = useCallback(async (game: GameEntry, query?: string): Promise<CoverSearchResponse> => {
+    const response = await retroApi.searchCovers(game.id, query)
+    if (response.warnings[0]) showToast(response.warnings[0], 'info')
+    return response
+  }, [showToast])
+
+  const handleDownloadCover = useCallback(async (game: GameEntry, cover: CoverSearchResult) => {
+    await withBusy(async () => {
+      const response = await retroApi.downloadCover(game.id, cover)
+      setSnapshot(response.snapshot)
+      showToast(response.result.message, response.result.ok ? 'success' : 'error')
     })
   }, [showToast, withBusy])
 
-  const handleSaveEmulator = useCallback(
-    async (config: EmulatorConfig) => {
-      await withBusy(async () => {
-        const nextSnapshot = await retroApi.saveEmulator(config)
-        setSnapshot(nextSnapshot)
-        showToast('Configuración de consola guardada.', 'success')
-      }).catch((error) => {
-        showToast(error instanceof Error ? error.message : 'No se pudo guardar la configuración.', 'error')
-      })
-    },
-    [showToast, withBusy]
-  )
+  const handleDownloadMissingCovers = useCallback(async (consoleId?: ConsoleId) => {
+    await withBusy(async () => {
+      const response = await retroApi.downloadMissingCovers(consoleId, 30)
+      setSnapshot(response.snapshot)
+      showToast(
+        `Carátulas: ${response.summary.downloaded} descargadas, ${response.summary.skipped} omitidas, ${response.summary.failed} fallidas.`,
+        response.summary.failed ? 'info' : 'success'
+      )
+    }).catch((err) => showToast(err instanceof Error ? err.message : 'Error al descargar.', 'error'))
+  }, [showToast, withBusy])
 
-  const handleSaveMetadataSettings = useCallback(
-    async (settings: MetadataSettings) => {
-      await withBusy(async () => {
-        const nextSnapshot = await retroApi.saveMetadataSettings(settings)
-        setSnapshot(nextSnapshot)
-        showToast('Configuración de carátulas online guardada.', 'success')
-      }).catch((error) => {
-        showToast(error instanceof Error ? error.message : 'No se pudo guardar la configuración de carátulas online.', 'error')
-      })
-    },
-    [showToast, withBusy]
-  )
+  const openGame = useCallback((game: GameEntry) => {
+    setView((v) => ({ name: 'game', gameId: game.id, returnTo: v.name === 'console' ? (v as { consoleId: ConsoleId }).consoleId : undefined }))
+  }, [])
 
-  const handleLaunchGame = useCallback(
-    async (game: GameEntry) => {
-      const result = await retroApi.launchGame(game.id)
-      setSnapshot(result.snapshot)
-      showToast(result.result.message, result.result.ok ? 'success' : 'error')
-    },
-    [showToast]
-  )
+  const goBack = useCallback(() => {
+    const v = viewRef.current
+    if (v.name === 'game') {
+      if ('returnTo' in v && v.returnTo) setView({ name: 'console', consoleId: v.returnTo })
+      else setView({ name: 'home' })
+    } else if (v.name === 'console' || v.name === 'settings' || v.name === 'search') {
+      setView({ name: 'home' })
+    }
+  }, [])
 
-  const handleToggleFavorite = useCallback(
-    async (game: GameEntry) => {
-      const nextSnapshot = await retroApi.toggleFavorite(game.id)
-      setSnapshot(nextSnapshot)
-      showToast(game.favorite ? 'Eliminado de favoritos.' : 'Añadido a favoritos.', 'success')
-    },
-    [showToast]
-  )
+  const toggleFocusedFavorite = useCallback(async () => {
+    const snap = snapshotRef.current
+    if (!snap) return
+    const focused = document.activeElement
+    const gameId = focused?.closest('[data-game-id]')?.getAttribute('data-game-id')
+    if (!gameId) return
+    const game = snap.games.find((g) => g.id === gameId)
+    if (game) await handleToggleFavorite(game)
+  }, [handleToggleFavorite])
 
-  const handleSearchCovers = useCallback(
-    async (game: GameEntry, query?: string): Promise<CoverSearchResponse> => {
-      const response = await retroApi.searchCovers(game.id, query)
-      if (response.warnings[0]) showToast(response.warnings[0], 'info')
-      return response
-    },
-    [showToast]
-  )
+  useGamepad({
+    onAction: useCallback((action) => {
+      switch (action) {
+        case 'back': goBack(); break
+        case 'menu': setView({ name: 'home' }); break
+        case 'search': setView({ name: 'search' }); break
+        case 'favorite': void toggleFocusedFavorite(); break
+        default: break
+      }
+    }, [goBack, toggleFocusedFavorite]),
+  })
 
-  const handleDownloadCover = useCallback(
-    async (game: GameEntry, cover: CoverSearchResult) => {
-      await withBusy(async () => {
-        const response = await retroApi.downloadCover(game.id, cover)
-        setSnapshot(response.snapshot)
-        showToast(response.result.message, response.result.ok ? 'success' : 'error')
-      })
-    },
-    [showToast, withBusy]
-  )
-
-  const handleDownloadMissingCovers = useCallback(
-    async (consoleId?: ConsoleId) => {
-      await withBusy(async () => {
-        const response = await retroApi.downloadMissingCovers(consoleId, 30)
-        setSnapshot(response.snapshot)
-        showToast(
-          `Búsqueda de carátulas completada. Descargadas: ${response.summary.downloaded}, omitidas: ${response.summary.skipped}, fallidas: ${response.summary.failed}.`,
-          response.summary.failed ? 'info' : 'success'
-        )
-      }).catch((error) => {
-        showToast(error instanceof Error ? error.message : 'Error al descargar carátulas faltantes.', 'error')
-      })
-    },
-    [showToast, withBusy]
-  )
-
-  const openGame = useCallback(
-    (game: GameEntry) => {
-      setView({ name: 'game', gameId: game.id, returnTo: view.name === 'console' ? view.consoleId : undefined })
-    },
-    [view]
-  )
+  const selectedGame = useMemo(() => {
+    if (!snapshot || view.name !== 'game') return undefined
+    return snapshot.games.find((g) => g.id === view.gameId)
+  }, [snapshot, view])
 
   if (!snapshot) {
     return (
       <div className="grid min-h-screen place-items-center bg-night text-white">
-        <div className="rounded-lg border border-white/8 bg-white/[0.045] p-8 text-center shadow-card">
+        <div className="rounded-xl border border-white/8 bg-white/[0.045] p-8 text-center shadow-card">
           <div className="mx-auto mb-5 h-12 w-12 animate-spin rounded-full border-2 border-white/20 border-t-mint" />
-          <p className="text-sm font-bold uppercase text-white/54">Cargando Sarkan Vault</p>
+          <p className="text-sm font-bold uppercase tracking-widest text-white/54">Cargando Sarkan Vault</p>
         </div>
       </div>
     )
@@ -205,12 +201,13 @@ export default function App(): JSX.Element {
 
   const activeView = view.name === 'game' ? 'console' : view.name
 
-  let viewContent: React.ReactNode
+  let viewContent: React.ReactNode = null
+
   if (view.name === 'home') {
     viewContent = (
       <HomeScreen
         snapshot={snapshot}
-        onOpenConsole={(consoleId) => setView({ name: 'console', consoleId })}
+        onOpenConsole={(id) => setView({ name: 'console', consoleId: id })}
         onOpenGame={openGame}
         onLaunchGame={handleLaunchGame}
       />
@@ -219,9 +216,7 @@ export default function App(): JSX.Element {
     viewContent = (
       <SearchScreen
         snapshot={snapshot}
-        onOpenGame={(game) => {
-          openGame(game)
-        }}
+        onOpenGame={openGame}
         onLaunchGame={handleLaunchGame}
       />
     )
@@ -240,14 +235,12 @@ export default function App(): JSX.Element {
       <GameDetailsScreen
         game={selectedGame}
         snapshot={snapshot}
-        onBack={() => (view.returnTo ? setView({ name: 'console', consoleId: view.returnTo }) : setView({ name: 'home' }))}
+        onBack={goBack}
         onLaunch={handleLaunchGame}
         onToggleFavorite={handleToggleFavorite}
         onSearchCovers={handleSearchCovers}
         onDownloadCover={handleDownloadCover}
-        onRevealPath={(filePath) => {
-          void retroApi.revealPath(filePath)
-        }}
+        onRevealPath={(path) => { void retroApi.revealPath(path) }}
       />
     )
   } else if (view.name === 'settings') {
@@ -280,7 +273,6 @@ export default function App(): JSX.Element {
       <div key={transitionKey} className="animate-view-in">
         {viewContent}
       </div>
-
       <Toast message={toast?.message} tone={toast?.tone} onDismiss={() => setToast(undefined)} />
     </AppShell>
   )
