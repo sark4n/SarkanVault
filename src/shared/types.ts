@@ -5,6 +5,7 @@ export type ConsoleId =
   | 'ps1'
   | 'gba'
   | 'nds'
+  | 'dreamcast'
 
 export type GameSource = 'scan' | 'sample'
 

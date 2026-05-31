@@ -204,6 +204,40 @@ export const consoleCatalog: ConsoleDefinition[] = [
         retroArchCoreNames: ['melonds_libretro.dll', 'desmume_libretro.dll']
       }
     ]
+  },
+  {
+    id: 'dreamcast',
+    name: 'Sega Dreamcast',
+    shortName: 'Dreamcast',
+    manufacturer: 'Sega',
+    generation: '128-bit',
+    description: 'La última consola de Sega: acción 3D de culto, shooters intensos y joyas arcade únicas.',
+    colorFrom: '#e05c2a',
+    colorTo: '#ff9f4a',
+    accent: '#ffcf86',
+    romExtensions: ['.cdi', '.gdi', '.chd', '.cue', '.iso', '.zip'],
+    imageUrl: 'https://images.pexels.com/photos/3719248/pexels-photo-3719248.jpeg?auto=compress&cs=tinysrgb&w=400',
+    candidates: [
+      {
+        name: 'Flycast',
+        executableNames: ['flycast.exe', 'flycast-win64.exe'],
+        installHints: ['Flycast'],
+        defaultLaunchArguments: '"{rom}"'
+      },
+      {
+        name: 'Redream',
+        executableNames: ['redream.exe'],
+        installHints: ['Redream'],
+        defaultLaunchArguments: '"{rom}"'
+      },
+      {
+        name: 'RetroArch',
+        executableNames: ['retroarch.exe'],
+        installHints: ['RetroArch'],
+        defaultLaunchArguments: '-L "{core}" "{rom}"',
+        retroArchCoreNames: ['flycast_libretro.dll']
+      }
+    ]
   }
 ]
 

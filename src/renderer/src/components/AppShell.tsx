@@ -203,15 +203,6 @@ export function AppShell({
           </button>
         </header>
 
-        {snapshot.sampleMode ? (
-          <div className="mb-6 flex items-start gap-3 rounded-lg border border-volt/20 bg-volt/10 px-4 py-3 text-sm text-volt">
-            <Sparkles className="mt-0.5 h-4 w-4 shrink-0" />
-            <p>
-              Mostrando estanterías de muestra hasta que se configuren las carpetas de ROMs. Todo aquí es offline y local; tus juegos
-              reales aparecerán después de la configuración y el escaneo.
-            </p>
-          </div>
-        ) : null}
 
         {children}
       </main>

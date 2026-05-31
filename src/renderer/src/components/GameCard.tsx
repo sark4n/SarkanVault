@@ -13,7 +13,7 @@ interface GameCardProps {
 
 export function GameCard({ game, consoleDef, onOpen, onLaunch, compact = false }: GameCardProps): JSX.Element {
   const genre = inferGenre(game)
-  const cardWidth = compact ? 'w-[184px]' : 'w-[240px]'
+  const cardWidth = compact ? 'w-[220px]' : 'w-[240px]'
   const coverAspect = compact ? 'aspect-[3/4]' : 'aspect-[2/3]'
 
   return (
