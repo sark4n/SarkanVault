@@ -1,7 +1,6 @@
-import { Database, Gamepad2, Maximize2, Minus, Chrome as Home, RefreshCw, Search, Settings, Sparkles, X } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import type { GameEntry, LibrarySnapshot } from '@shared/types'
-import { SearchDropdown } from '@renderer/components/SearchDropdown'
+import { Database, Gamepad2, Maximize2, Minus, Chrome as Home, RefreshCw, Search, Settings, X } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import type { LibrarySnapshot } from '@shared/types'
 
 const windowControls = window.windowControls
 
@@ -9,13 +8,10 @@ interface AppShellProps {
   snapshot: LibrarySnapshot
   activeView: string
   isBusy: boolean
-  searchQuery: string
-  onSearchChange: (query: string) => void
   onHome: () => void
+  onSearch: () => void
   onSettings: () => void
   onScan: () => void
-  onSelectSearchResult: (game: GameEntry) => void
-  onLaunchSearchResult: (game: GameEntry) => void
   children: React.ReactNode
 }
 
@@ -23,40 +19,13 @@ export function AppShell({
   snapshot,
   activeView,
   isBusy,
-  searchQuery,
-  onSearchChange,
   onHome,
+  onSearch,
   onSettings,
   onScan,
-  onSelectSearchResult,
-  onLaunchSearchResult,
   children
 }: AppShellProps): JSX.Element {
-  const [searchOpen, setSearchOpen] = useState(false)
   const [isMaximized, setIsMaximized] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  const focusSearch = useCallback(() => {
-    inputRef.current?.focus()
-    setSearchOpen(true)
-  }, [])
-
-  const clearSearch = useCallback(() => {
-    onSearchChange('')
-    setSearchOpen(false)
-    inputRef.current?.blur()
-  }, [onSearchChange])
-
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault()
-        focusSearch()
-      }
-    }
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  }, [focusSearch])
 
   useEffect(() => {
     if (!windowControls) return
@@ -78,28 +47,13 @@ export function AppShell({
 
       <div className="fixed inset-x-0 top-0 z-50 flex items-center justify-end gap-0 px-2 py-2" style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}>
         <div className="flex items-center" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
-          <button
-            type="button"
-            onClick={handleMinimize}
-            className="inline-flex h-8 w-8 items-center justify-center rounded text-white/50 transition hover:bg-white/10 hover:text-white"
-            title="Minimizar"
-          >
+          <button type="button" onClick={handleMinimize} className="inline-flex h-8 w-8 items-center justify-center rounded text-white/50 transition hover:bg-white/10 hover:text-white" title="Minimizar">
             <Minus className="h-4 w-4" />
           </button>
-          <button
-            type="button"
-            onClick={handleMaximize}
-            className="inline-flex h-8 w-8 items-center justify-center rounded text-white/50 transition hover:bg-white/10 hover:text-white"
-            title={isMaximized ? 'Restaurar' : 'Maximizar'}
-          >
+          <button type="button" onClick={handleMaximize} className="inline-flex h-8 w-8 items-center justify-center rounded text-white/50 transition hover:bg-white/10 hover:text-white" title={isMaximized ? 'Restaurar' : 'Maximizar'}>
             <Maximize2 className="h-3.5 w-3.5" />
           </button>
-          <button
-            type="button"
-            onClick={handleClose}
-            className="inline-flex h-8 w-8 items-center justify-center rounded text-white/50 transition hover:bg-red-500/80 hover:text-white"
-            title="Cerrar"
-          >
+          <button type="button" onClick={handleClose} className="inline-flex h-8 w-8 items-center justify-center rounded text-white/50 transition hover:bg-red-500/80 hover:text-white" title="Cerrar">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -121,6 +75,9 @@ export function AppShell({
             </NavIcon>
             <NavIcon active={activeView === 'console'} title="Biblioteca" onClick={onHome}>
               <Database className="h-5 w-5" />
+            </NavIcon>
+            <NavIcon active={activeView === 'search'} title="Buscar" onClick={onSearch}>
+              <Search className="h-5 w-5" />
             </NavIcon>
             <NavIcon active={activeView === 'settings'} title="Configuración" onClick={onSettings}>
               <Settings className="h-5 w-5" />
@@ -150,49 +107,17 @@ export function AppShell({
               </span>
             </span>
           </button>
-          <div className="relative min-w-0 flex-1">
-            <div className="flex h-11 w-full items-center gap-3 rounded-md border border-white/8 bg-black/20 px-4">
-              <Search className="h-4 w-4 shrink-0 text-white/38" />
-              <input
-                ref={inputRef}
-                type="text"
-                value={searchQuery}
-                onChange={(e) => {
-                  onSearchChange(e.target.value)
-                  setSearchOpen(true)
-                }}
-                onFocus={() => setSearchOpen(true)}
-                className="h-full min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/34"
-                placeholder="Buscar juegos..."
-              />
-              {!searchQuery && (
-                <kbd className="shrink-0 rounded border border-white/12 bg-white/6 px-2 py-0.5 text-[10px] font-semibold text-white/34">
-                  Ctrl+K
-                </kbd>
-              )}
-            </div>
-            <SearchDropdown
-              query={searchQuery}
-              games={snapshot.games}
-              consoles={snapshot.consoles}
-              onSelect={(game) => {
-                onSelectSearchResult(game)
-                clearSearch()
-              }}
-              onLaunch={(game) => {
-                onLaunchSearchResult(game)
-                clearSearch()
-              }}
-              onClose={clearSearch}
-              visible={searchOpen}
-            />
-          </div>
-          {searchOpen && searchQuery && (
-            <div
-              className="fixed inset-0 z-40"
-              onClick={clearSearch}
-            />
-          )}
+
+          <div className="flex-1" />
+
+          <button
+            type="button"
+            onClick={onSearch}
+            className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md transition ${activeView === 'search' ? 'bg-white text-night' : 'bg-white/8 text-white hover:bg-white/14'}`}
+            title="Buscar"
+          >
+            <Search className="h-4 w-4" />
+          </button>
           <button
             type="button"
             onClick={onSettings}
@@ -202,7 +127,6 @@ export function AppShell({
             <Settings className="h-4 w-4" />
           </button>
         </header>
-
 
         {children}
       </main>

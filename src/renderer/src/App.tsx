@@ -14,6 +14,7 @@ import { retroApi } from '@renderer/lib/api'
 import { ConsoleScreen } from '@renderer/views/ConsoleScreen'
 import { GameDetailsScreen } from '@renderer/views/GameDetailsScreen'
 import { HomeScreen } from '@renderer/views/HomeScreen'
+import { SearchScreen } from '@renderer/views/SearchScreen'
 import { SettingsScreen } from '@renderer/views/SettingsScreen'
 
 type View =
@@ -21,6 +22,7 @@ type View =
   | { name: 'console'; consoleId: ConsoleId }
   | { name: 'game'; gameId: string; returnTo?: ConsoleId }
   | { name: 'settings' }
+  | { name: 'search' }
 
 interface ToastState {
   message: string
@@ -32,7 +34,6 @@ export default function App(): JSX.Element {
   const [view, setView] = useState<View>({ name: 'home' })
   const [isBusy, setIsBusy] = useState(false)
   const [toast, setToast] = useState<ToastState>()
-  const [searchQuery, setSearchQuery] = useState('')
   const [transitionKey, setTransitionKey] = useState(0)
   const prevViewName = useRef<string>(view.name)
 
@@ -214,6 +215,16 @@ export default function App(): JSX.Element {
         onLaunchGame={handleLaunchGame}
       />
     )
+  } else if (view.name === 'search') {
+    viewContent = (
+      <SearchScreen
+        snapshot={snapshot}
+        onOpenGame={(game) => {
+          openGame(game)
+        }}
+        onLaunchGame={handleLaunchGame}
+      />
+    )
   } else if (view.name === 'console') {
     viewContent = (
       <ConsoleScreen
@@ -261,27 +272,12 @@ export default function App(): JSX.Element {
       snapshot={snapshot}
       activeView={activeView}
       isBusy={isBusy}
-      searchQuery={searchQuery}
-      onSearchChange={setSearchQuery}
-      onHome={() => {
-        setSearchQuery('')
-        setView({ name: 'home' })
-      }}
+      onHome={() => setView({ name: 'home' })}
+      onSearch={() => setView({ name: 'search' })}
       onSettings={() => setView({ name: 'settings' })}
       onScan={handleScan}
-      onSelectSearchResult={(game) => {
-        setSearchQuery('')
-        openGame(game)
-      }}
-      onLaunchSearchResult={(game) => {
-        setSearchQuery('')
-        void handleLaunchGame(game)
-      }}
     >
-      <div
-        key={transitionKey}
-        className="animate-view-in"
-      >
+      <div key={transitionKey} className="animate-view-in">
         {viewContent}
       </div>
 
