@@ -33,6 +33,7 @@ async function createWindow(): Promise<void> {
     height: 940,
     minWidth: 1060,
     minHeight: 720,
+    fullscreen: true,
     title: 'Sarkan Vault',
     backgroundColor: '#07080d',
     autoHideMenuBar: true,
