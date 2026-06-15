@@ -105,7 +105,7 @@ const previewConsoles: ConsoleDefinition[] = [
     shortName: 'Switch',
     manufacturer: 'Nintendo',
     generation: '8th Hybrid',
-    description: 'La consola hibrida de Nintendo: joyas exclusivas como Breath of the Wild y Mario Odyssey.',
+    description: 'La consola hibrida de Nintendo ',
     colorFrom: '#e60012',
     colorTo: '#1a1a1a',
     accent: '#00d4aa',
@@ -228,6 +228,13 @@ function createPreviewApi(): RetroLauncherApi {
         games: snapshot.games.map((game) => (game.id === gameId ? { ...game, favorite: !game.favorite } : game))
       }
       snapshot.favorites = snapshot.games.filter((game) => game.favorite)
+      return snapshot
+    },
+    toggleHidden: async (gameId) => {
+      snapshot = {
+        ...snapshot,
+        games: snapshot.games.map((game) => (game.id === gameId ? { ...game, hidden: !game.hidden } : game))
+      }
       return snapshot
     },
     revealPath: async () => undefined

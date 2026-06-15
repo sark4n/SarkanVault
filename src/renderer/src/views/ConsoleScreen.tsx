@@ -10,6 +10,7 @@ interface ConsoleScreenProps {
   snapshot: LibrarySnapshot
   onOpenGame: (game: GameEntry) => void
   onLaunchGame: (game: GameEntry) => void
+  onToggleHidden: (game: GameEntry) => void
   onOpenSettings: () => void
 }
 
@@ -18,6 +19,7 @@ export function ConsoleScreen({
   snapshot,
   onOpenGame,
   onLaunchGame,
+  onToggleHidden,
   onOpenSettings
 }: ConsoleScreenProps): JSX.Element {
   const [query, setQuery] = useState('')
@@ -141,6 +143,7 @@ export function ConsoleScreen({
         consoles={snapshot.consoles}
         onOpenGame={onOpenGame}
         onLaunchGame={onLaunchGame}
+        onToggleHidden={onToggleHidden}
         compact
       />
 
@@ -151,6 +154,7 @@ export function ConsoleScreen({
         consoles={snapshot.consoles}
         onOpenGame={onOpenGame}
         onLaunchGame={onLaunchGame}
+        onToggleHidden={onToggleHidden}
         compact
       />
 
@@ -177,6 +181,7 @@ export function ConsoleScreen({
                       consoleDef={consoleDef}
                       onOpen={onOpenGame}
                       onLaunch={onLaunchGame}
+                      onToggleHidden={onToggleHidden}
                       compact
                     />
                   ))}

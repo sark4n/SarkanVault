@@ -11,6 +11,7 @@ interface GameDetailsScreenProps {
   onBack: () => void
   onLaunch: (game: GameEntry) => void
   onToggleFavorite: (game: GameEntry) => void
+  onToggleHidden: (game: GameEntry) => void
   onSearchCovers: (game: GameEntry, query?: string) => Promise<{ results: CoverSearchResult[]; warnings: string[] }>
   onDownloadCover: (game: GameEntry, cover: CoverSearchResult) => Promise<void>
   onRevealPath: (filePath: string) => void
@@ -22,6 +23,7 @@ export function GameDetailsScreen({
   onBack,
   onLaunch,
   onToggleFavorite,
+  onToggleHidden,
   onSearchCovers,
   onDownloadCover,
   onRevealPath

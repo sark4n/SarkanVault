@@ -166,6 +166,11 @@ function registerIpc(): void {
     return store.getSnapshot()
   })
 
+  ipcMain.handle('games:toggleHidden', async (_event, gameId: string) => {
+    await store.toggleHidden(gameId)
+    return store.getSnapshot()
+  })
+
   ipcMain.handle('shell:revealPath', async (_event, targetPath: string) => {
     if (targetPath) shell.showItemInFolder(targetPath)
   })

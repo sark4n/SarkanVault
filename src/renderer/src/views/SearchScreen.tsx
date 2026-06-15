@@ -8,9 +8,10 @@ interface SearchScreenProps {
   snapshot: LibrarySnapshot
   onOpenGame: (game: GameEntry) => void
   onLaunchGame: (game: GameEntry) => void
+  onToggleHidden: (game: GameEntry) => void
 }
 
-export function SearchScreen({ snapshot, onOpenGame, onLaunchGame }: SearchScreenProps): JSX.Element {
+export function SearchScreen({ snapshot, onOpenGame, onLaunchGame, onToggleHidden }: SearchScreenProps): JSX.Element {
   const [query, setQuery] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -76,12 +77,14 @@ export function SearchScreen({ snapshot, onOpenGame, onLaunchGame }: SearchScree
           consoles={snapshot.consoles}
           onOpenGame={onOpenGame}
           onLaunchGame={onLaunchGame}
+          onToggleHidden={onToggleHidden}
         />
       ) : (
         <SuggestedContent
           snapshot={snapshot}
           onOpenGame={onOpenGame}
           onLaunchGame={onLaunchGame}
+          onToggleHidden={onToggleHidden}
         />
       )}
     </div>
@@ -94,9 +97,10 @@ interface SearchResultsProps {
   consoles: ConsoleDefinition[]
   onOpenGame: (game: GameEntry) => void
   onLaunchGame: (game: GameEntry) => void
+  onToggleHidden: (game: GameEntry) => void
 }
 
-function SearchResults({ query, results, consoles, onOpenGame, onLaunchGame }: SearchResultsProps): JSX.Element {
+function SearchResults({ query, results, consoles, onOpenGame, onLaunchGame, onToggleHidden }: SearchResultsProps): JSX.Element {
   if (!results.length) {
     return (
       <div className="flex flex-col items-center justify-center py-32 text-center">
@@ -136,9 +140,10 @@ interface SuggestedContentProps {
   snapshot: LibrarySnapshot
   onOpenGame: (game: GameEntry) => void
   onLaunchGame: (game: GameEntry) => void
+  onToggleHidden: (game: GameEntry) => void
 }
 
-function SuggestedContent({ snapshot, onOpenGame, onLaunchGame }: SuggestedContentProps): JSX.Element {
+function SuggestedContent({ snapshot, onOpenGame, onLaunchGame, onToggleHidden }: SuggestedContentProps): JSX.Element {
   const recentGames = snapshot.recentlyPlayed.slice(0, 12)
   const favoriteGames = snapshot.favorites.slice(0, 12)
   const allGames = sortGames(snapshot.games, 'title').slice(0, 18)
@@ -153,6 +158,7 @@ function SuggestedContent({ snapshot, onOpenGame, onLaunchGame }: SuggestedConte
           consoles={snapshot.consoles}
           onOpenGame={onOpenGame}
           onLaunchGame={onLaunchGame}
+          onToggleHidden={onToggleHidden}
         />
       )}
       {favoriteGames.length > 0 && (
@@ -163,6 +169,7 @@ function SuggestedContent({ snapshot, onOpenGame, onLaunchGame }: SuggestedConte
           consoles={snapshot.consoles}
           onOpenGame={onOpenGame}
           onLaunchGame={onLaunchGame}
+          onToggleHidden={onToggleHidden}
         />
       )}
       <SuggestedRow
@@ -172,6 +179,7 @@ function SuggestedContent({ snapshot, onOpenGame, onLaunchGame }: SuggestedConte
         consoles={snapshot.consoles}
         onOpenGame={onOpenGame}
         onLaunchGame={onLaunchGame}
+        onToggleHidden={onToggleHidden}
       />
     </div>
   )
@@ -184,9 +192,10 @@ interface SuggestedRowProps {
   consoles: ConsoleDefinition[]
   onOpenGame: (game: GameEntry) => void
   onLaunchGame: (game: GameEntry) => void
+  onToggleHidden: (game: GameEntry) => void
 }
 
-function SuggestedRow({ icon, title, games, consoles, onOpenGame, onLaunchGame }: SuggestedRowProps): JSX.Element {
+function SuggestedRow({ icon, title, games, consoles, onOpenGame, onLaunchGame, onToggleHidden }: SuggestedRowProps): JSX.Element {
   return (
     <section>
       <div className="mb-4 flex items-center gap-2">

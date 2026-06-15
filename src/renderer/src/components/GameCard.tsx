@@ -1,4 +1,4 @@
-import { Clock3, Play, Star } from 'lucide-react'
+import { Clock3, Play, Star, Eye, EyeOff } from 'lucide-react'
 import type { ConsoleDefinition, GameEntry } from '@shared/types'
 import { formatDate, inferGenre } from '@renderer/lib/format'
 import { CoverFrame } from './CoverFrame'
@@ -8,10 +8,11 @@ interface GameCardProps {
   consoleDef: ConsoleDefinition
   onOpen: (game: GameEntry) => void
   onLaunch: (game: GameEntry) => void
+  onToggleHidden: (game: GameEntry) => void
   compact?: boolean
 }
 
-export function GameCard({ game, consoleDef, onOpen, onLaunch, compact = false }: GameCardProps): JSX.Element {
+export function GameCard({ game, consoleDef, onOpen, onLaunch, onToggleHidden, compact = false }: GameCardProps): JSX.Element {
   const genre = inferGenre(game)
   const cardWidth = compact ? 'w-[220px]' : 'w-[240px]'
   const coverAspect = compact ? 'aspect-[3/4]' : 'aspect-[2/3]'
@@ -56,7 +57,26 @@ export function GameCard({ game, consoleDef, onOpen, onLaunch, compact = false }
             <Clock3 className="h-3.5 w-3.5 shrink-0" />
             <span className="truncate">{formatDate(game.lastPlayed)}</span>
           </span>
-          {game.favorite ? <Star className="h-4 w-4 shrink-0 fill-volt text-volt" /> : null}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                onToggleHidden(game)
+              }}
+              aria-label={game.hidden ? `Mostrar ${game.title}` : `Ocultar ${game.title}`}
+              tabIndex={-1}
+              className="rounded p-1 transition hover:bg-white/10"
+              title={game.hidden ? 'Mostrar' : 'Ocultar'}
+            >
+              {game.hidden ? (
+                <EyeOff className="h-3.5 w-3.5 shrink-0" />
+              ) : (
+                <Eye className="h-3.5 w-3.5 shrink-0" />
+              )}
+            </button>
+            {game.favorite ? <Star className="h-4 w-4 shrink-0 fill-volt text-volt" /> : null}
+          </div>
         </div>
 
         <button

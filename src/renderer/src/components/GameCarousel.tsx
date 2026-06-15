@@ -10,6 +10,7 @@ interface GameCarouselProps {
   consoles: ConsoleDefinition[]
   onOpenGame: (game: GameEntry) => void
   onLaunchGame: (game: GameEntry) => void
+  onToggleHidden?: (game: GameEntry) => void
   onSeeAll?: () => void
   onOpenConsole?: () => void
   compact?: boolean
@@ -22,6 +23,7 @@ export function GameCarousel({
   consoles,
   onOpenGame,
   onLaunchGame,
+  onToggleHidden,
   onSeeAll,
   onOpenConsole,
   compact,
@@ -60,6 +62,7 @@ export function GameCarousel({
                 consoleDef={consoleDef}
                 onOpen={onOpenGame}
                 onLaunch={onLaunchGame}
+                onToggleHidden={onToggleHidden || (() => {})}
                 compact={compact}
               />
             </div>

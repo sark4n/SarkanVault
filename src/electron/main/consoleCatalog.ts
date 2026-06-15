@@ -281,7 +281,7 @@ export const consoleCatalog: ConsoleDefinition[] = [
     shortName: 'Switch',
     manufacturer: 'Nintendo',
     generation: '8th Hybrid',
-    description: 'La consola hibrida de Nintendo: joyas exclusivas como Breath of the Wild, Mario Odyssey y Animal Crossing en casa o portatil.',
+    description: 'La consola hibrida de Nintendo portatil.',
     colorFrom: '#e60012',
     colorTo: '#1a1a1a',
     accent: '#00d4aa',

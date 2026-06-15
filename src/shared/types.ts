@@ -68,6 +68,7 @@ export interface GameEntry {
   source: GameSource
   genre?: string
   metadata?: GameMetadata
+  hidden?: boolean
 }
 
 export interface GameMetadata {
@@ -234,5 +235,6 @@ export interface RetroLauncherApi {
   chooseFolder: () => Promise<string | undefined>
   launchGame: (gameId: string) => Promise<{ snapshot: LibrarySnapshot; result: LaunchResult }>
   toggleFavorite: (gameId: string) => Promise<LibrarySnapshot>
+  toggleHidden: (gameId: string) => Promise<LibrarySnapshot>
   revealPath: (filePath: string) => Promise<void>
 }

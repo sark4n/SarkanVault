@@ -18,6 +18,7 @@ const api: RetroLauncherApi = {
   chooseFolder: () => ipcRenderer.invoke('dialog:chooseFolder'),
   launchGame: (gameId: string) => ipcRenderer.invoke('games:launch', gameId),
   toggleFavorite: (gameId: string) => ipcRenderer.invoke('games:toggleFavorite', gameId),
+  toggleHidden: (gameId: string) => ipcRenderer.invoke('games:toggleHidden', gameId),
   revealPath: (filePath: string) => ipcRenderer.invoke('shell:revealPath', filePath)
 }
 

@@ -42,6 +42,7 @@ export function AppShell({
 }: AppShellProps): JSX.Element {
   const [isMaximized, setIsMaximized] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [titleOpacity, setTitleOpacity] = useState(1)
   const menuRef = useRef<HTMLDivElement>(null)
 
   const consoleMode = useConsoleMode()
@@ -83,6 +84,17 @@ export function AppShell({
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [menuOpen])
+
+  // ── Scroll effect for title opacity ────────────────────────────────────
+  useEffect(() => {
+    const handleScroll = () => {
+      const opacity = Math.max(0, 1 - window.scrollY / 140)
+      setTitleOpacity(opacity)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const handleMinimize = useCallback(() => { windowControls?.minimize().catch(() => {}) }, [])
   const handleMaximize = useCallback(() => { windowControls?.maximize().catch(() => {}) }, [])
@@ -150,7 +162,7 @@ export function AppShell({
       )}
 
       {/* Floating Logo / Nav Menu */}
-      <div ref={menuRef} className="fixed left-6 top-6 z-40">
+      <div ref={menuRef} className="fixed left-6 top-6 z-40 flex items-center gap-3">
         <button
           type="button"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -163,15 +175,22 @@ export function AppShell({
           title="Menú – Sarkan Vault"
           aria-expanded={menuOpen}
           aria-haspopup="true"
+          style={{ position: 'relative', zIndex: menuOpen ? 50 : 40 }}
         >
           <Gamepad2 className="h-7 w-7" />
         </button>
+        <h1 
+          className="text-2xl font-extrabold uppercase tracking-[0.25em] text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-purple-400 drop-shadow-[0_0_12px_rgba(56,189,248,0.35)] transition-opacity duration-300 animate-shimmer"
+          style={{ opacity: titleOpacity }}
+        >
+          SarkaN Vault
+        </h1>
 
         {/* Dropdown */}
         <div
           className={`absolute left-0 top-20 flex flex-col gap-2 transition-all duration-300 origin-top ${
             menuOpen
-              ? 'opacity-100 scale-100 translate-y-0'
+              ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto'
               : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
           }`}
           aria-hidden={!menuOpen}

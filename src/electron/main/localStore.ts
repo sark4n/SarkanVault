@@ -189,6 +189,17 @@ export class LocalStore {
     await this.save()
   }
 
+  async toggleHidden(gameId: string): Promise<void> {
+    const state = await this.load()
+    const game = state.games.find((item) => item.id === gameId && item.source === 'scan')
+
+    if (!game) return
+
+    game.hidden = !game.hidden
+    game.updatedAt = new Date().toISOString()
+    await this.save()
+  }
+
   async setGameCover(gameId: string, coverPath: string): Promise<void> {
     const state = await this.load()
     const game = state.games.find((item) => item.id === gameId && item.source === 'scan')

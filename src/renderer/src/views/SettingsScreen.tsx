@@ -6,10 +6,12 @@ import { getConsole, shortPath } from '@renderer/lib/format'
 interface SettingsScreenProps {
   snapshot: LibrarySnapshot
   isBusy: boolean
+  showHidden: boolean
   onDetect: () => Promise<void>
   onScan: () => Promise<void>
   onSave: (config: EmulatorConfig) => Promise<void>
   onSaveMetadataSettings: (settings: MetadataSettings) => Promise<void>
+  onToggleShowHidden: () => void
   onDownloadMissingCovers: (consoleId?: ConsoleId) => Promise<void>
   onChooseExecutable: () => Promise<string | undefined>
   onChooseImage: () => Promise<string | undefined>
@@ -19,10 +21,12 @@ interface SettingsScreenProps {
 export function SettingsScreen({
   snapshot,
   isBusy,
+  showHidden,
   onDetect,
   onScan,
   onSave,
   onSaveMetadataSettings,
+  onToggleShowHidden,
   onDownloadMissingCovers,
   onChooseExecutable,
   onChooseImage,
@@ -116,6 +120,34 @@ export function SettingsScreen({
         <SetupStat icon={<Cpu className="h-5 w-5" />} label="Sistemas configurados" value={`${configuredCount}/${snapshot.consoles.length}`} />
         <SetupStat icon={<Database className="h-5 w-5" />} label="Juegos escaneados" value={String(snapshot.stats.totalGames)} />
         <SetupStat icon={<Settings2 className="h-5 w-5" />} label="Modo de datos" value={metadataDraft.steamGridDb.enabled || metadataDraft.screenScraper.enabled ? 'Híbrido' : 'JSON Offline'} />
+      </section>
+
+      <section className="rounded-lg border border-white/8 bg-white/[0.045] p-6 shadow-card">
+        <p className="text-xs font-extrabold uppercase text-white/42">Opciones de biblioteca</p>
+        <h2 className="mt-2 font-display text-2xl font-bold text-white">Visibilidad de Juegos</h2>
+        <p className="mt-2 text-sm text-white/54">Controla qué juegos se muestran en tu biblioteca.</p>
+        
+        <div className="mt-5 flex items-center justify-between rounded-lg border border-white/8 bg-white/[0.02] p-4">
+          <div>
+            <p className="font-bold text-white">Mostrar juegos ocultos</p>
+            <p className="mt-1 text-sm text-white/50">Visualiza los juegos que has ocultado de tu biblioteca</p>
+          </div>
+          <button
+            type="button"
+            onClick={onToggleShowHidden}
+            className={`inline-flex h-10 w-16 items-center rounded-full transition ${
+              showHidden
+                ? 'bg-mint/20 border border-mint/40'
+                : 'bg-white/8 border border-white/12'
+            }`}
+          >
+            <div
+              className={`h-8 w-8 rounded-full bg-white transition-transform ${
+                showHidden ? 'translate-x-7' : 'translate-x-1'
+              }`}
+            />
+          </button>
+        </div>
       </section>
 
       <section className="overflow-hidden rounded-lg border border-white/8 bg-white/[0.045] shadow-card backdrop-blur-2xl">

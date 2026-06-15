@@ -37,6 +37,7 @@ export default function App(): JSX.Element {
   const [view, setView] = useState<View>({ name: 'home' })
   const [isBusy, setIsBusy] = useState(false)
   const [toast, setToast] = useState<ToastState>()
+  const [showHidden, setShowHidden] = useState(false)
   const [transitionKey, setTransitionKey] = useState(0)
   const prevViewName = useRef<string>(view.name)
   const viewRef = useRef<View>(view)
@@ -65,6 +66,25 @@ export default function App(): JSX.Element {
     const id = window.setTimeout(() => setToast(undefined), 5200)
     return () => window.clearTimeout(id)
   }, [toast])
+
+  // Filter games based on showHidden state
+  const filteredSnapshot = useMemo(() => {
+    if (!snapshot) return undefined
+    if (showHidden) return snapshot
+
+    return {
+      ...snapshot,
+      games: snapshot.games.filter((g) => !g.hidden),
+      recentlyPlayed: snapshot.recentlyPlayed.filter((g) => !g.hidden),
+      favorites: snapshot.favorites.filter((g) => !g.hidden),
+      stats: {
+        ...snapshot.stats,
+        totalGames: snapshot.games.filter((g) => !g.hidden).length,
+        favoriteCount: snapshot.games.filter((g) => !g.hidden && g.favorite).length,
+        recentlyPlayedCount: snapshot.recentlyPlayed.filter((g) => !g.hidden).length
+      }
+    }
+  }, [snapshot, showHidden])
 
   // ── View transitions with focus memory ────────────────────────────────────
   useEffect(() => {
@@ -138,6 +158,12 @@ export default function App(): JSX.Element {
     const next = await retroApi.toggleFavorite(game.id)
     setSnapshot(next)
     showToast(game.favorite ? 'Eliminado de favoritos.' : 'Añadido a favoritos.', 'success')
+  }, [showToast])
+
+  const handleToggleHidden = useCallback(async (game: GameEntry) => {
+    const next = await retroApi.toggleHidden(game.id)
+    setSnapshot(next)
+    showToast(game.hidden ? 'Juego mostrado.' : 'Juego oculto.', 'success')
   }, [showToast])
 
   const handleSearchCovers = useCallback(async (game: GameEntry, query?: string): Promise<CoverSearchResponse> => {
@@ -236,27 +262,30 @@ export default function App(): JSX.Element {
   if (view.name === 'home') {
     viewContent = (
       <HomeScreen
-        snapshot={snapshot}
+        snapshot={filteredSnapshot!}
         onOpenConsole={(id) => setView({ name: 'console', consoleId: id })}
         onOpenGame={openGame}
         onLaunchGame={handleLaunchGame}
+        onToggleHidden={handleToggleHidden}
       />
     )
   } else if (view.name === 'search') {
     viewContent = (
       <SearchScreen
-        snapshot={snapshot}
+        snapshot={filteredSnapshot!}
         onOpenGame={openGame}
         onLaunchGame={handleLaunchGame}
+        onToggleHidden={handleToggleHidden}
       />
     )
   } else if (view.name === 'console') {
     viewContent = (
       <ConsoleScreen
         consoleId={view.consoleId}
-        snapshot={snapshot}
+        snapshot={filteredSnapshot!}
         onOpenGame={openGame}
         onLaunchGame={handleLaunchGame}
+        onToggleHidden={handleToggleHidden}
         onOpenSettings={() => setView({ name: 'settings' })}
       />
     )
@@ -268,6 +297,7 @@ export default function App(): JSX.Element {
         onBack={goBack}
         onLaunch={handleLaunchGame}
         onToggleFavorite={handleToggleFavorite}
+        onToggleHidden={handleToggleHidden}
         onSearchCovers={handleSearchCovers}
         onDownloadCover={handleDownloadCover}
         onRevealPath={(path) => { void retroApi.revealPath(path) }}
@@ -282,6 +312,8 @@ export default function App(): JSX.Element {
         onScan={handleScan}
         onSave={handleSaveEmulator}
         onSaveMetadataSettings={handleSaveMetadataSettings}
+        showHidden={showHidden}
+        onToggleShowHidden={() => setShowHidden((v) => !v)}
         onDownloadMissingCovers={handleDownloadMissingCovers}
         onChooseExecutable={retroApi.chooseExecutable}
         onChooseImage={retroApi.chooseImage}
