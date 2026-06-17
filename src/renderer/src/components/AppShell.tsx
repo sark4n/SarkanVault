@@ -417,7 +417,7 @@ export function AppShell({
                 <Power className="h-5 w-5 text-red-400" />
               </div>
               <div>
-                <h2 className="text-base font-bold text-white">Salir de SarkanVault</h2>
+                <h2 className="text-base font-bold text-white">Salir de Sarkan Vault</h2>
                 <p className="text-xs text-white/50 mt-0.5">¿Estás seguro que quieres salir?</p>
               </div>
             </div>
