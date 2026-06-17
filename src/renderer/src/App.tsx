@@ -10,6 +10,7 @@ import type {
 } from '@shared/types'
 import type { GamepadAction } from '@renderer/lib/gamepadManager'
 import { AppShell } from '@renderer/components/AppShell'
+import { ProfileSelector } from '@renderer/components/ProfileSelector'
 import { Toast } from '@renderer/components/Toast'
 import { retroApi } from '@renderer/lib/api'
 import { useGamepad } from '@renderer/hooks/useGamepad'
@@ -19,6 +20,13 @@ import { GameDetailsScreen } from '@renderer/views/GameDetailsScreen'
 import { HomeScreen } from '@renderer/views/HomeScreen'
 import { SearchScreen } from '@renderer/views/SearchScreen'
 import { SettingsScreen } from '@renderer/views/SettingsScreen'
+import { ProfileScreen } from '@renderer/views/ProfileScreen'
+import {
+  type UserProfile,
+  getProfiles,
+  getActiveProfileId,
+  setActiveProfileId,
+} from '@renderer/lib/profileStore'
 
 type View =
   | { name: 'home' }
@@ -26,6 +34,7 @@ type View =
   | { name: 'game'; gameId: string; returnTo?: ConsoleId }
   | { name: 'settings' }
   | { name: 'search' }
+  | { name: 'profile' }
 
 interface ToastState {
   message: string
@@ -39,6 +48,24 @@ export default function App(): JSX.Element {
   const [toast, setToast] = useState<ToastState>()
   const [showHidden, setShowHidden] = useState(false)
   const [transitionKey, setTransitionKey] = useState(0)
+
+  // ── Profile state ─────────────────────────────────────────────────────────
+  const [activeProfile, setActiveProfile] = useState<UserProfile | null>(() => {
+    const id = getActiveProfileId()
+    if (!id) return null
+    return getProfiles().find(p => p.id === id) ?? null
+  })
+  const [showProfileSelector, setShowProfileSelector] = useState(!activeProfile)
+
+  const handleSelectProfile = useCallback((p: UserProfile) => {
+    setActiveProfileId(p.id)
+    setActiveProfile(p)
+    setShowProfileSelector(false)
+  }, [])
+
+  const handleSwitchProfile = useCallback(() => {
+    setShowProfileSelector(true)
+  }, [])
   const prevViewName = useRef<string>(view.name)
   const viewRef = useRef<View>(view)
   const snapshotRef = useRef<LibrarySnapshot | undefined>(snapshot)
@@ -255,6 +282,11 @@ export default function App(): JSX.Element {
     )
   }
 
+  // ── Profile selector overlay ──────────────────────────────────────────────
+  if (showProfileSelector || !activeProfile) {
+    return <ProfileSelector onSelect={handleSelectProfile} />
+  }
+
   const activeView = view.name === 'game' ? 'console' : view.name
 
   let viewContent: React.ReactNode = null
@@ -303,6 +335,14 @@ export default function App(): JSX.Element {
         onRevealPath={(path) => { void retroApi.revealPath(path) }}
       />
     )
+  } else if (view.name === 'profile') {
+    viewContent = (
+      <ProfileScreen
+        profile={activeProfile}
+        onSave={updated => setActiveProfile(updated)}
+        onBack={() => setView({ name: 'home' })}
+      />
+    )
   } else if (view.name === 'settings') {
     viewContent = (
       <SettingsScreen
@@ -327,10 +367,13 @@ export default function App(): JSX.Element {
       snapshot={snapshot}
       activeView={activeView}
       isBusy={isBusy}
+      profile={activeProfile}
       onHome={() => setView({ name: 'home' })}
       onSearch={() => setView({ name: 'search' })}
       onSettings={() => setView({ name: 'settings' })}
+      onProfile={() => setView({ name: 'profile' })}
       onScan={handleScan}
+      onSwitchProfile={handleSwitchProfile}
     >
       <div key={transitionKey} className="animate-view-in">
         {viewContent}

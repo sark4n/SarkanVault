@@ -1,4 +1,4 @@
-import { Cloud, Cpu, Database, Download, FolderOpen, Image, RefreshCw, Save, Search, Settings2 } from 'lucide-react'
+import { Cloud, Cpu, Database, Download, Expand, FolderOpen, Image, RefreshCw, Save, Search, Settings2, Shrink } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import type { ConsoleId, EmulatorConfig, LibrarySnapshot, MetadataSettings } from '@shared/types'
 import { getConsole, shortPath } from '@renderer/lib/format'
@@ -146,6 +146,30 @@ export function SettingsScreen({
                 showHidden ? 'translate-x-7' : 'translate-x-1'
               }`}
             />
+          </button>
+        </div>
+
+        {/* Fullscreen toggle */}
+        <div className="mt-3 flex items-center justify-between rounded-lg border border-white/8 bg-white/[0.02] p-4">
+          <div>
+            <p className="font-bold text-white">Pantalla completa</p>
+            <p className="mt-1 text-sm text-white/50">Mostrar SarkanVault en pantalla completa (F11)</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {})
+              } else {
+                document.exitFullscreen().catch(() => {})
+              }
+            }}
+            className="inline-flex items-center gap-2 rounded-lg border border-white/12 bg-white/6 px-4 py-2 text-sm text-white/70 hover:bg-white/12 hover:text-white transition"
+          >
+            {document.fullscreenElement
+              ? <><Shrink className="h-4 w-4" /> Salir</>
+              : <><Expand className="h-4 w-4" /> Activar</>
+            }
           </button>
         </div>
       </section>
