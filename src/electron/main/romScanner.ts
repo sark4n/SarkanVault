@@ -66,7 +66,7 @@ export class RomScanner {
 
     const warnings: string[] = []
 
-    if (!config.romFolderPath) {
+    if (!config.romFolderPath && !config.romFolderPath2) {
       return {
         consoleId: config.consoleId,
         romFolderPath: '',
@@ -75,21 +75,36 @@ export class RomScanner {
       }
     }
 
-    if (!(await pathExists(config.romFolderPath))) {
-      return {
-        consoleId: config.consoleId,
-        romFolderPath: config.romFolderPath,
-        totalGames: 0,
-        warnings: ['Configured ROM folder was not found.']
+    const supportedExtensions = new Set(config.supportedExtensions.map((extension) => extension.toLowerCase()))
+    const coverIndex = config.coverFolderPath ? await buildCoverIndex(config.coverFolderPath) : new Map<string, string>()
+    const now = new Date().toISOString()
+    const allRomFiles: string[] = []
+
+    // Scan primary folder
+    if (config.romFolderPath) {
+      if (!(await pathExists(config.romFolderPath))) {
+        warnings.push('Carpeta de ROMs principal no encontrada.')
+      } else {
+        const files = await collectFiles(config.romFolderPath, (entryPath) =>
+          supportedExtensions.has(extname(entryPath).toLowerCase())
+        )
+        allRomFiles.push(...files)
       }
     }
 
-    const supportedExtensions = new Set(config.supportedExtensions.map((extension) => extension.toLowerCase()))
-    const romFiles = await collectFiles(config.romFolderPath, (entryPath) =>
-      supportedExtensions.has(extname(entryPath).toLowerCase())
-    )
-    const coverIndex = config.coverFolderPath ? await buildCoverIndex(config.coverFolderPath) : new Map<string, string>()
-    const now = new Date().toISOString()
+    // Scan secondary folder
+    if (config.romFolderPath2) {
+      if (!(await pathExists(config.romFolderPath2))) {
+        warnings.push('Carpeta de ROMs secundaria no encontrada.')
+      } else {
+        const files = await collectFiles(config.romFolderPath2, (entryPath) =>
+          supportedExtensions.has(extname(entryPath).toLowerCase())
+        )
+        allRomFiles.push(...files)
+      }
+    }
+
+    const romFiles = allRomFiles.sort((a, b) => a.localeCompare(b))
     const games: GameEntry[] = romFiles.map((romPath) => {
       const parsed = parse(romPath)
       const title = cleanTitle(parsed.name)
@@ -124,7 +139,7 @@ export class RomScanner {
   private async scanPcLibrary(config: EmulatorConfig): Promise<ScanSummary['consoles'][number]> {
     const warnings: string[] = []
 
-    if (!config.romFolderPath) {
+    if (!config.romFolderPath && !config.romFolderPath2) {
       return {
         consoleId: config.consoleId,
         romFolderPath: '',
@@ -133,19 +148,32 @@ export class RomScanner {
       }
     }
 
-    if (!(await pathExists(config.romFolderPath))) {
-      return {
-        consoleId: config.consoleId,
-        romFolderPath: config.romFolderPath,
-        totalGames: 0,
-        warnings: ['Configured PC games folder was not found.']
+    const supportedExtensions = new Set(config.supportedExtensions.map((extension) => extension.toLowerCase()))
+    const allLaunchFiles: string[] = []
+
+    if (config.romFolderPath) {
+      if (!(await pathExists(config.romFolderPath))) {
+        warnings.push('Carpeta de juegos PC principal no encontrada.')
+      } else {
+        const files = await collectFiles(config.romFolderPath, (entryPath) =>
+          supportedExtensions.has(extname(entryPath).toLowerCase())
+        )
+        allLaunchFiles.push(...files)
       }
     }
 
-    const supportedExtensions = new Set(config.supportedExtensions.map((extension) => extension.toLowerCase()))
-    const launchFiles = await collectFiles(config.romFolderPath, (entryPath) =>
-      supportedExtensions.has(extname(entryPath).toLowerCase())
-    )
+    if (config.romFolderPath2) {
+      if (!(await pathExists(config.romFolderPath2))) {
+        warnings.push('Carpeta de juegos PC secundaria no encontrada.')
+      } else {
+        const files = await collectFiles(config.romFolderPath2, (entryPath) =>
+          supportedExtensions.has(extname(entryPath).toLowerCase())
+        )
+        allLaunchFiles.push(...files)
+      }
+    }
+
+    const launchFiles = allLaunchFiles
     const coverIndex = config.coverFolderPath ? await buildCoverIndex(config.coverFolderPath) : new Map<string, string>()
     const now = new Date().toISOString()
     const entries = await Promise.all(launchFiles.map((launchPath) => createPcGameEntry(config, launchPath, coverIndex, now)))

@@ -21,14 +21,14 @@ import { HomeScreen } from '@renderer/views/HomeScreen'
 import { SearchScreen } from '@renderer/views/SearchScreen'
 import { SettingsScreen } from '@renderer/views/SettingsScreen'
 import { ProfileScreen } from '@renderer/views/ProfileScreen'
+import { LibraryScreen } from '@renderer/views/LibraryScreen'
+import { MyGamesScreen } from '@renderer/views/MyGamesScreen'
 import {
   type UserProfile,
   getProfiles,
   getActiveProfileId,
   setActiveProfileId,
 } from '@renderer/lib/profileStore'
-
-export type Section = 'principal' | 'biblioteca' | 'mis-juegos'
 
 type View =
   | { name: 'home' }
@@ -37,6 +37,8 @@ type View =
   | { name: 'settings' }
   | { name: 'search' }
   | { name: 'profile' }
+  | { name: 'library' }
+  | { name: 'mygames' }
 
 interface ToastState {
   message: string
@@ -46,7 +48,6 @@ interface ToastState {
 export default function App(): JSX.Element {
   const [snapshot, setSnapshot] = useState<LibrarySnapshot>()
   const [view, setView] = useState<View>({ name: 'home' })
-  const [activeSection, setActiveSection] = useState<Section>('principal')
   const [isBusy, setIsBusy] = useState(false)
   const [toast, setToast] = useState<ToastState>()
   const [showHidden, setShowHidden] = useState(false)
@@ -292,52 +293,18 @@ export default function App(): JSX.Element {
 
   const activeView = view.name === 'game' ? 'console' : view.name
 
-  // Get favorite games for active profile
-  const profileFavoriteIds = useMemo(() => new Set(activeProfile?.favoriteGameIds ?? []), [activeProfile])
-  const profileFavoriteGames = useMemo(() => {
-    if (!filteredSnapshot) return []
-    return filteredSnapshot.games.filter(g => profileFavoriteIds.has(g.id) || g.favorite)
-  }, [filteredSnapshot, profileFavoriteIds])
-
   let viewContent: React.ReactNode = null
 
-  // Section-based content when on home view
   if (view.name === 'home') {
-    if (activeSection === 'principal') {
-      viewContent = (
-        <HomeScreen
-          snapshot={filteredSnapshot!}
-          onOpenConsole={(id) => setView({ name: 'console', consoleId: id })}
-          onOpenGame={openGame}
-          onLaunchGame={handleLaunchGame}
-          onToggleHidden={handleToggleHidden}
-          section="principal"
-        />
-      )
-    } else if (activeSection === 'biblioteca') {
-      viewContent = (
-        <HomeScreen
-          snapshot={filteredSnapshot!}
-          onOpenConsole={(id) => setView({ name: 'console', consoleId: id })}
-          onOpenGame={openGame}
-          onLaunchGame={handleLaunchGame}
-          onToggleHidden={handleToggleHidden}
-          section="biblioteca"
-        />
-      )
-    } else if (activeSection === 'mis-juegos') {
-      viewContent = (
-        <HomeScreen
-          snapshot={filteredSnapshot!}
-          onOpenConsole={(id) => setView({ name: 'console', consoleId: id })}
-          onOpenGame={openGame}
-          onLaunchGame={handleLaunchGame}
-          onToggleHidden={handleToggleHidden}
-          section="mis-juegos"
-          profileFavorites={profileFavoriteGames}
-        />
-      )
-    }
+    viewContent = (
+      <HomeScreen
+        snapshot={filteredSnapshot!}
+        onOpenConsole={(id) => setView({ name: 'console', consoleId: id })}
+        onOpenGame={openGame}
+        onLaunchGame={handleLaunchGame}
+        onToggleHidden={handleToggleHidden}
+      />
+    )
   } else if (view.name === 'search') {
     viewContent = (
       <SearchScreen
@@ -380,6 +347,23 @@ export default function App(): JSX.Element {
         onBack={() => setView({ name: 'home' })}
       />
     )
+  } else if (view.name === 'library') {
+    viewContent = (
+      <LibraryScreen
+        snapshot={filteredSnapshot!}
+        onOpenConsole={(id) => setView({ name: 'console', consoleId: id })}
+      />
+    )
+  } else if (view.name === 'mygames') {
+    viewContent = (
+      <MyGamesScreen
+        snapshot={filteredSnapshot!}
+        profile={activeProfile}
+        onOpenGame={openGame}
+        onLaunchGame={handleLaunchGame}
+        onToggleHidden={handleToggleHidden}
+      />
+    )
   } else if (view.name === 'settings') {
     viewContent = (
       <SettingsScreen
@@ -403,16 +387,16 @@ export default function App(): JSX.Element {
     <AppShell
       snapshot={snapshot}
       activeView={activeView}
-      activeSection={activeSection}
       isBusy={isBusy}
       profile={activeProfile}
-      onHome={() => { setView({ name: 'home' }); setActiveSection('principal'); }}
+      onHome={() => setView({ name: 'home' })}
+      onLibrary={() => setView({ name: 'library' })}
+      onMyGames={() => setView({ name: 'mygames' })}
       onSearch={() => setView({ name: 'search' })}
       onSettings={() => setView({ name: 'settings' })}
       onProfile={() => setView({ name: 'profile' })}
       onScan={handleScan}
       onSwitchProfile={handleSwitchProfile}
-      onSectionChange={(section) => { setActiveSection(section); setView({ name: 'home' }); }}
     >
       <div key={transitionKey} className="animate-view-in">
         {viewContent}

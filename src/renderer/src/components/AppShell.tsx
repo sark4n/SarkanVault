@@ -1,4 +1,16 @@
-import { Database, Gamepad2, House, RefreshCw, Search, Settings, Power, X, CircleUser as UserCircle2, Monitor, Heart } from 'lucide-react'
+import {
+  Database,
+  Gamepad2,
+  Heart,
+  House,
+  RefreshCw,
+  Search,
+  Settings,
+  Power,
+  X,
+  UserCircle2,
+  Monitor,
+} from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { LibrarySnapshot, GameEntry, ConsoleDefinition } from '@shared/types'
 import type { UserProfile } from '@renderer/lib/profileStore'
@@ -10,39 +22,38 @@ import {
 } from '@renderer/components/GamepadIndicator'
 import { useConsoleMode } from '@renderer/hooks/useConsoleMode'
 import { useGamepad } from '@renderer/hooks/useGamepad'
-import type { Section } from '@renderer/App'
 
 const windowControls = window.windowControls
 
 interface AppShellProps {
   snapshot?: LibrarySnapshot
   activeView: string
-  activeSection: Section
   isBusy: boolean
   profile: UserProfile
   onHome: () => void
+  onLibrary: () => void
+  onMyGames: () => void
   onSearch: () => void
   onSettings: () => void
   onProfile: () => void
   onScan: () => void
   onSwitchProfile: () => void
-  onSectionChange: (section: Section) => void
   children: React.ReactNode
 }
 
 export function AppShell({
   snapshot,
   activeView,
-  activeSection,
   isBusy,
   profile,
   onHome,
+  onLibrary,
+  onMyGames,
   onSearch,
   onSettings,
   onProfile,
   onScan,
   onSwitchProfile,
-  onSectionChange,
   children,
 }: AppShellProps): JSX.Element {
   const [menuOpen, setMenuOpen]           = useState(false)
@@ -296,11 +307,6 @@ export function AppShell({
                   label="Mi Perfil"
                   onClick={() => { setProfileMenuOpen(false); onProfile() }}
                 />
-                <ProfileMenuItem
-                  icon={<Settings className="h-4 w-4" />}
-                  label="Configuración"
-                  onClick={() => { setProfileMenuOpen(false); onSettings() }}
-                />
                 <div className="my-1 mx-3 h-px bg-white/8" />
                 <ProfileMenuItem
                   icon={<Monitor className="h-4 w-4" />}
@@ -319,9 +325,8 @@ export function AppShell({
         </div>
       </div>
 
-      {/* ── Logo / Section Tabs / Nav Menu ── */}
-      <div ref={menuRef} className="fixed left-6 top-6 z-40 flex items-center gap-4">
-        {/* Menu button */}
+      {/* ── Logo / Nav Menu ── */}
+      <div ref={menuRef} className="fixed left-6 top-6 z-40 flex items-center gap-3">
         <button
           type="button"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -338,54 +343,25 @@ export function AppShell({
           <Gamepad2 className="h-7 w-7" />
         </button>
 
-        {/* Section Tabs */}
+        <h1
+          className={`text-2xl font-extrabold uppercase tracking-[0.25em] transition-all duration-300 cursor-pointer ${
+            activeView === 'home'
+              ? 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-purple-400 drop-shadow-[0_0_12px_rgba(56,189,248,0.35)] animate-shimmer'
+              : 'text-white/50'
+          }`}
+          style={{ opacity: titleOpacity }}
+          onClick={onHome}
+          title="Inicio"
+        >
+          SarkaN Vault
+        </h1>
+
+        {/* Inline nav labels */}
         <div className="flex items-center gap-1" style={{ opacity: titleOpacity }}>
-          {/* Logo Title */}
-          <h1
-            onClick={() => onSectionChange('principal')}
-            className={`text-2xl font-extrabold uppercase tracking-[0.20em] cursor-pointer transition-all duration-300 ${
-              activeSection === 'principal'
-                ? 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-purple-400 drop-shadow-[0_0_12px_rgba(56,189,248,0.45)] animate-shimmer'
-                : 'text-white/40 hover:text-white/60'
-            }`}
-          >
-            SarkaN Vault
-          </h1>
-
-          {/* Separator */}
-          <span className="text-white/20 mx-1 text-xl">|</span>
-
-          {/* Biblioteca Tab */}
-          <button
-            type="button"
-            onClick={() => onSectionChange('biblioteca')}
-            className={`text-xl font-extrabold uppercase tracking-[0.18em] px-2 py-1 rounded-lg transition-all duration-300 ${
-              activeSection === 'biblioteca'
-                ? 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-purple-400 drop-shadow-[0_0_12px_rgba(56,189,248,0.45)] animate-shimmer'
-                : 'text-white/40 hover:text-white/60 hover:bg-white/5'
-            }`}
-          >
-            Biblioteca
-          </button>
-
-          {/* Separator */}
-          <span className="text-white/20 mx-1 text-xl">|</span>
-
-          {/* Mis Juegos Tab */}
-          <button
-            type="button"
-            onClick={() => onSectionChange('mis-juegos')}
-            className={`text-xl font-extrabold uppercase tracking-[0.18em] px-2 py-1 rounded-lg transition-all duration-300 flex items-center gap-1.5 ${
-              activeSection === 'mis-juegos'
-                ? 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-purple-400 drop-shadow-[0_0_12px_rgba(56,189,248,0.45)] animate-shimmer'
-                : 'text-white/40 hover:text-white/60 hover:bg-white/5'
-            }`}
-          >
-            Mis Juegos
-            {activeSection === 'mis-juegos' && (
-              <Heart className="h-4 w-4 fill-pulse text-pulse" />
-            )}
-          </button>
+          <span className="text-white/20 text-xl font-light select-none">|</span>
+          <NavLabel active={activeView === 'library'} onClick={onLibrary}>Biblioteca</NavLabel>
+          <span className="text-white/20 text-xl font-light select-none px-1">|</span>
+          <NavLabel active={activeView === 'mygames'} onClick={onMyGames}>Mis Juegos</NavLabel>
         </div>
 
         {/* Dropdown */}
@@ -407,8 +383,13 @@ export function AppShell({
             </NavItem>
 
             {/* Biblioteca */}
-            <NavItem active={activeView === 'console'} title="Biblioteca" onClick={() => { onHome(); setMenuOpen(false) }}>
+            <NavItem active={activeView === 'library'} title="Biblioteca" onClick={() => { onLibrary(); setMenuOpen(false) }}>
               <Database className="h-5 w-5" />
+            </NavItem>
+
+            {/* Mis Juegos */}
+            <NavItem active={activeView === 'mygames'} title="Mis Juegos" onClick={() => { onMyGames(); setMenuOpen(false) }}>
+              <Heart className="h-5 w-5" />
             </NavItem>
 
             {/* Buscar */}
@@ -417,6 +398,11 @@ export function AppShell({
             </NavItem>
 
             <div className="my-1 h-px bg-white/10" />
+
+            {/* Configuración */}
+            <NavItem title="Configuración" onClick={() => { onSettings(); setMenuOpen(false) }}>
+              <Settings className="h-5 w-5" />
+            </NavItem>
 
             {/* Escanear */}
             <NavItem title="Escanear biblioteca" onClick={() => { onScan(); setMenuOpen(false) }} busy={isBusy}>
@@ -455,7 +441,7 @@ export function AppShell({
                 <Power className="h-5 w-5 text-red-400" />
               </div>
               <div>
-                <h2 className="text-base font-bold text-white">Salir de Sarkan Vault</h2>
+                <h2 className="text-base font-bold text-white">Salir de SarkanVault</h2>
                 <p className="text-xs text-white/50 mt-0.5">¿Estás seguro que quieres salir?</p>
               </div>
             </div>
@@ -481,6 +467,34 @@ export function AppShell({
       <GamepadHintBar hints={hintBarHints} visible={gamepadActive && hasGamepad} />
       <GamepadHotplugOverlay />
     </div>
+  )
+}
+
+
+// ── Nav label (inline next to title) ─────────────────────────────────────────
+
+function NavLabel({
+  active, onClick, children,
+}: {
+  active: boolean; onClick: () => void; children: React.ReactNode
+}): JSX.Element {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`text-2xl font-extrabold uppercase tracking-[0.25em] transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mint ${
+        active
+          ? 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-purple-400 drop-shadow-[0_0_12px_rgba(56,189,248,0.35)] animate-shimmer'
+          : 'text-white/30 hover:text-white/60'
+      }`}
+      style={active ? {
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+      } : {}}
+    >
+      {children}
+    </button>
   )
 }
 

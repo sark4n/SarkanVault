@@ -67,7 +67,7 @@ export function SettingsScreen({
     if (filePath) updateDraft(selectedConsoleId, { executablePath: filePath })
   }
 
-  const chooseFolder = async (field: 'romFolderPath' | 'coverFolderPath'): Promise<void> => {
+  const chooseFolder = async (field: 'romFolderPath' | 'romFolderPath2' | 'coverFolderPath'): Promise<void> => {
     const folderPath = await onChooseFolder()
     if (folderPath) updateDraft(selectedConsoleId, { [field]: folderPath })
   }
@@ -386,6 +386,13 @@ export function SettingsScreen({
               placeholder={isPc ? 'D:\\Juegos o D:\\Juegos\\Accesos directos' : 'D:\\ROMs\\SNES'}
             />
             <PathField
+              label={isPc ? 'Carpeta de juegos secundaria (opcional)' : 'Carpeta de ROMs secundaria (opcional)'}
+              value={selectedDraft.romFolderPath2 || ''}
+              onChange={(value) => updateDraft(selectedConsoleId, { romFolderPath2: value })}
+              onBrowse={() => chooseFolder('romFolderPath2')}
+              placeholder={isPc ? 'D:\\OtrosDiscos\\Juegos' : 'E:\\ROMs\\SNES'}
+            />
+            <PathField
               label="Carpeta de carátulas"
               value={selectedDraft.coverFolderPath}
               onChange={(value) => updateDraft(selectedConsoleId, { coverFolderPath: value })}
@@ -436,6 +443,11 @@ export function SettingsScreen({
             <div className="flex flex-col gap-3 rounded-lg border border-white/8 bg-black/18 p-4 text-sm text-white/58 md:flex-row md:items-center md:justify-between">
               <span className="min-w-0 truncate">
                 {isPc ? 'Carpeta de juegos actual' : 'Carpeta de ROMs actual'}: {shortPath(selectedDraft.romFolderPath, 78)}
+                {selectedDraft.romFolderPath2 && (
+                  <span className="block truncate">
+                    {isPc ? 'Carpeta secundaria' : 'ROMs secundaria'}: {shortPath(selectedDraft.romFolderPath2, 78)}
+                  </span>
+                )}
               </span>
               <button
                 type="button"

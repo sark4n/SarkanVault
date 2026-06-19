@@ -42,6 +42,7 @@ export interface EmulatorConfig {
   emulatorName: string
   executablePath: string
   romFolderPath: string
+  romFolderPath2?: string
   coverFolderPath: string
   supportedExtensions: string[]
   launchArguments: string
